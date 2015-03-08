@@ -1,6 +1,6 @@
 {
   "name": "funktion",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An easy-to-use functional library.",
   "main": "library/funktion.js",
   "directories": {
