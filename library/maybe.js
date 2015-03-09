@@ -4,7 +4,7 @@ module.exports = maybe = function (val){
             return f.maybe(val!==undefined?funk(val):undefined)
         },
         mjoin:function(){
-            var value = 
+            var value = undefined
             if(val!==undefined){
                 val.map(function(unpackaged){
                     value = unpackaged
