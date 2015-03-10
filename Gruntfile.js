@@ -26,7 +26,7 @@ Works with the following project structure.
 */
 
 
-var sources = 'library/*.js'
+var sources = 'library/**/*.js'
 var test_server_port = 8000
 
 module.exports = function(grunt) {
@@ -84,14 +84,6 @@ module.exports = function(grunt) {
 
             }
         },
-	docco: {
-	  debug: {
-	      src: ['test/**/*.js'],
-	         options: {
-		        output: 'docs/'
-			}
-		}
-	},
 
 
         browserify: {
@@ -106,24 +98,7 @@ module.exports = function(grunt) {
                 }
             }
         },
-		
-        docco: {
-            options: {
-                dst: './docs/annotated-source',
-                layout: 'parallel'
-            },
-            docs: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: './',
-                        src: [
-                            'tests/*.js'
-                        ]
-                    }
-                ]
-            }
-        },
+
 		
         jshint: {
             src: [sources]
@@ -139,9 +114,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     //grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-exorcise');
-    grunt.loadNpmTasks('grunt-docco');
-	grunt.loadNpmTasks('grunt-docco2');
-
     grunt.registerTask('build', ['browserify', "exorcise", 'uglify']);
     grunt.registerTask('default', ['build', 'test']);
     grunt.registerTask('test', [/*'jshint',*/ 'connect', 'qunit']);

@@ -37,5 +37,8 @@
   "bugs": {
     "url": "https://github.com/boris-marinov/funktion/issues"
   },
-  "homepage": "https://github.com/boris-marinov/funktion"
+  "homepage": "https://github.com/boris-marinov/funktion",
+  "dependencies": {
+    "lodash": "^3.5.0"
+  }
 }
