@@ -1,104 +1,42 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Funktion by boris-marinov</title>
+---
+layout: default
+title: Home
+---
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<!-- Show last 5 posts here -->
+{% for post in paginator.posts %}
+	<article>
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Funktion</h1>
-        <p>(Yet another) JavaScript library for functional programming.</p>
-        <p class="view"><a href="https://github.com/boris-marinov/funktion">View the Project on GitHub <small>boris-marinov/funktion</small></a></p>
-        <ul>
-          <li><a href="https://github.com/boris-marinov/funktion/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/boris-marinov/funktion/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/boris-marinov/funktion">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <p><a href="http://github.com/badges/stability-badges"><img src="http://badges.github.io/stability-badges/dist/experimental.svg" alt="experimental"></a></p>
+        <header>
+            <h2><a href="{{site.baseurl}}{{post.url}}">{{ post.title }}</a></h2>
+            <span class="date"><i class="icon-clock"></i><time datetime="{{post.date|date:"%F"}}">{{post.date|date:"%b %d, %Y"}}</time></span><br/>
+            <span class="category"><i class="icon-tag"></i> {{ post.categories | category_links }}</span><br/>
+            <span class="author"><i class="icon-user"></i> {% if post.author %}{{post.author}}{% else %}{{site.author}}{% endif%}</span>
+        </header>
+	
+		<div class="entry">{{ post.excerpt }}</div>
 
-<p>Yet another functional Javascript library, created for educational purposes. The idea here is to have absolutely the simplest implementations of all the data structures, so they can be easily grasped by everyone who is familiar with the language. </p>
+	</article>
+{% endfor %}
 
-<p>Also I won't use types. I am using the module pattern for everything, so the values can be effectively hidded away from you.</p>
 
-<pre><code>Work in progress. Stick around for more.
-</code></pre>
+<div id="paginator">
+    {% if paginator.next_page %}
+            <a href="{{site.baseurl}}/page{{paginator.next_page}}">
+            &laquo; Older Posts</a>
+    {% endif %}
 
-<h1>
-<a id="monads" class="anchor" href="#monads" aria-hidden="true"><span class="octicon octicon-link"></span></a>Monads</h1>
-
-<p>The infamous design patterns / value containers / programmable semicolons. etc.</p>
-
-<h2>
-<a id="maybe" class="anchor" href="#maybe" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maybe</h2>
-
-<p>A container for a value that may or not be there. </p>
-
-<p><code>var m = f.maybe(value)</code>:  Creates a new <code>maybe</code>. 
-If the value is equal to <em>undefined</em> it threats the container as empty.</p>
-
-<p><code>m.map(funk)</code>: Executes the function with the <code>maybe</code>'s value as an argument, but only if the value is different from <em>undefined</em>.</p>
-
-<p><code>m.mjoin()</code>: If the value of the <code>maybe</code> is another maybe, this function flattens the two maybes, by setting the value of the external one, as the value of the internal. </p>
-
-<p><code>m.chain(funk)</code>: Takes a function that accepts a value and returns another <code>maybe</code> and applies it to the current one (Equivalent to <code>m.map(funk).mjoin()</code>).</p>
-
-<h2>
-<a id="maybe-tutorial" class="anchor" href="#maybe-tutorial" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maybe Tutorial</h2>
-
-<p>The purpose of this monad is to eliminate the need for writing <code>null</code> checks. Furthermore it also eliminates the possibility of making errors by missing null-checks.</p>
-
-<p>We often have the following code:</p>
-
-<pre><code>var val = object[property]
-
-if(val !== undefined){
-    //do something with 'val'
-}
-</code></pre>
-
-<p>With <strong>maybe</strong> this becomes:</p>
-
-<pre><code>f.maybe(object[property]).map(function(val){
-    //do something with 'val'
-})
-</code></pre>
-
-<p>In other words <code>map</code> is executed only if the value inside the maybe is different from <em>undefined</em>.</p>
-
-<p>This is the key thing in eliminating  errors. If you have access to a value that may be undefined you can easily forget to null-check it.</p>
-
-<pre><code>var val = object[property](object)
-val.foo()//Blows up if val is undefined    
-</code></pre>
-
-<p>If you use <strong>maybe</strong> you cannot access the underlying value directly, and therefore you cannot execute an action on it, if it is not there.</p>
-
-<pre><code>f.maybe(object[property]).map(function(val){
-    val.foo()//Code does not get called.
-})
-</code></pre>
-
-<p>TBC</p>
-      </section>
-    </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/boris-marinov">boris-marinov</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
-  </body>
-</html>
+    {% if paginator.previous_page %}
+        {% if paginator.previous_page == 1 %}
+                <span class="more">
+                <a href="{{site.baseurl}}/">
+                Newer Posts &raquo; </a>
+                </span>
+        {% else %}
+                <span class="more">
+                <a href="{{site.baseurl}}/page{{paginator.previous_page}}">
+                Newer Posts &raquo; </a>
+                </span>
+        {% endif %}
+    {% endif %}
+</div>
