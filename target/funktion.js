@@ -19,59 +19,70 @@ module.exports = function(){
 	}
 }
 },{}],2:[function(require,module,exports){
-module.exports = function curry(funk, initial_arguments){
-	var context = this
-	return function(){
-		var all_arguments = (initial_arguments||[]).concat(Array.prototype.slice.call(arguments, 0))
-		return all_arguments.length>=funk.length?funk.apply(this, all_arguments):curry(funk, all_arguments)
-	}
-}
-},{}],3:[function(require,module,exports){
-var monads = require("./monads/monads")
 module.exports = {
 	compose:require("./compose"),
 	curry:require("./curry"),
 	map:require("./map"),
-	log:function(a){console.log(a);return a}
+	log:function(a){console.log(a);return a;}
 }
 
-
-window.f = module.exports
-window.m = monads
-},{"./compose":1,"./curry":2,"./map":4,"./monads/monads":9}],4:[function(require,module,exports){
+},{"./compose":1,"./curry":3,"./map":4}],3:[function(require,module,exports){
+module.exports = function curry(funk, initial_arguments){
+	var context = this
+	return function(){  
+		var all_arguments = (initial_arguments||[]).concat(Array.prototype.slice.call(arguments, 0))
+		return all_arguments.length>=funk.length?funk.apply(context, all_arguments):curry(funk, all_arguments)
+	}
+}
+},{}],4:[function(require,module,exports){
 var curry = require("./curry")
 module.exports = curry(function(funk, monad){
 		if(typeof funk!=="function"){throw funk+" is not a function"}
 		if(typeof monad.map!=="function"){throw monad+" is not a monad"}
 		return monad.map(funk)
-})
-},{"./curry":2}],5:[function(require,module,exports){
-var curry = require("../curry")
-module.exports = curry(function(funk, monad){
+}) 
+},{"./curry":3}],5:[function(require,module,exports){
+var monads = require("./monads/monads")
+var core = require("./core/core")
+var objects = require("./objects/objects")
+module.exports = {
+	m:monads,
+	f:core,
+	o:objects
+}
+
+
+window.f = core
+window.m = monads
+window.o = objects
+},{"./core/core":2,"./monads/monads":8,"./objects/objects":11}],6:[function(require,module,exports){
+var f = require("../core/core")
+module.exports = f.curry(function(funk, monad){
 		if(typeof funk!=="function"){throw funk+" is not a function"}
 		if(typeof monad.bind!=="function"){throw monad+" is not a monad"}
 		return monad.bind(funk)
 })
-},{"../curry":2}],6:[function(require,module,exports){
-var c = require("../compose")
-module.exports = function(methods){
+},{"../core/core":2}],7:[function(require,module,exports){
+var f = require("../core/core")
+var bind = require("./bind.js")
 
-	return function(a,b,c,d){return add_methods(methods.pure.apply(this, arguments))}
+module.exports = function(){
+	var args = Array.prototype.map.call(arguments, function(funk){ return bind(funk)})
+	return f.compose.apply(this, args) 
 
-	function add_methods(monad){
-		monad.map = c(add_methods, methods.map.bind(null, monad))
-		monad.join = c(add_methods, methods.join.bind(null, monad))
-		//monad.chain = monad.bind = c(add_methods, methods.join, methods.map.bind(null, monad))
-		monad.chain = monad.bind = function(funk){if(funk===undefined){throw "function not defined"}; return monad.map(funk).join()}
-
-		return monad;
-	}
 }
-},{"../compose":1}],7:[function(require,module,exports){
+},{"../core/core":2,"./bind.js":6}],8:[function(require,module,exports){
+module.exports = {
+	bind:(require("./bind")),
+	compose:(require("./compose"))
+}
+window.m = module.exports
+
+},{"./bind":6,"./compose":7}],9:[function(require,module,exports){
 module.exports = {
 	//a -> m a
-	pure:function(right, left){
-		return {_left:left, _right:right}
+	pure:function(right){
+		return {_right:right}
 	},
 	//m a -> ( a -> b ) -> m b
 	map:function(val, funk){
@@ -90,7 +101,7 @@ module.exports = {
 	}
 }
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = {
 	//a -> m a
 	pure:function(input){
@@ -111,15 +122,29 @@ module.exports = {
 	}
 }
 
-},{}],9:[function(require,module,exports){
-var constructor = require("./constructor")
-module.exports = {
-	maybe:constructor(require("./maybe")),
-	either:constructor(require("./either")),
-	bind:(require("./bind"))
+},{}],11:[function(require,module,exports){
+var f = require("../core/core")
+function create_type(methods){
+
+	return function(a,b,c,d){return add_methods(methods.pure.apply(this, arguments))}
+
+	function add_methods(monad){
+		monad.map = f.compose(add_methods, methods.map.bind(null, monad))
+		monad.join = f.compose(add_methods, methods.join.bind(null, monad))
+		//monad.chain = monad.bind = c(add_methods, methods.join, methods.map.bind(null, monad))
+		monad.chain = monad.bind = function(funk){if(funk===undefined){throw "function not defined"}; return monad.map(funk).join()}
+
+		return monad;
+	}
+	
 }
-window.m = module.exports
-},{"./bind":5,"./constructor":6,"./either":7,"./maybe":8}]},{},[1,2,3,4,5,6,7,8,9])
+
+module.exports = {
+	either:create_type(require("./either")),
+	maybe:create_type(require("./maybe")),
+}
+
+},{"../core/core":2,"./either":9,"./maybe":10}]},{},[1,2,3,4,5,6,7,8,9,10,11])
 
 
 //# sourceMappingURL=funktion.map

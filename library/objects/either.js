@@ -1,7 +1,7 @@
 module.exports = {
 	//a -> m a
-	pure:function(right, left){
-		return {_left:left, _right:right}
+	pure:function(right){
+		return {_right:right}
 	},
 	//m a -> ( a -> b ) -> m b
 	map:function(val, funk){

@@ -1,7 +1,5 @@
-var constructor = require("./constructor")
 module.exports = {
-	maybe:constructor(require("./maybe")),
-	either:constructor(require("./either")),
-	bind:(require("./bind"))
+	bind:(require("./bind")),
+	compose:(require("./compose"))
 }
 window.m = module.exports

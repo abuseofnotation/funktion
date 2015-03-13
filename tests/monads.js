@@ -3,23 +3,27 @@
 
 QUnit.module("Monads")
 
-QUnit.test("Maybe", function(assert){
-    
-    //The maybe monad is used to represent errors. For example this function returns a 'maybe' monad 
-    
-    var get = f.curry(function get(prop){
-        return function(obj){ return m.maybe(obj[prop]) }   
-    })
 
-    
-  // var get_a_b_c = function(obj){ return f.maybe(obj).chain(get("a")).chain(get("b")).chain(get("c"))}
+var mget = f.curry(function (prop, obj){
+	return o.maybe(obj[prop])   
+})
 
-   var get_a_b_c = f.compose(m.bind(get("c")), m.bind(get("b")), m.bind(get("a")), m.maybe)
-
-    var get_a_b_c_alt = function(obj){return m.maybe(obj).map(get("a")).join().map(get("b")).join().map(get("c")).join()}
+var get = f.curry(function (prop, obj){
+	return obj[prop]   
+})
 
 
-    var a_b_c = {a:{b:{c:"foo"}}}
+QUnit.test("Maybe", function(assert){ 
+	
+	assert.expect(3)
+  // var get_a_b_c = function(obj){ return f.maybe(obj).chain(mget("a")).chain(mget("b")).chain(mget("c"))}
+
+   var get_a_b_c = f.compose(m.bind(mget("c")), m.bind(mget("b")), f.map(get("a")), o.maybe) 
+
+    var get_a_b_c_alt = function(obj){return o.maybe(obj).map(mget("a")).join().map(mget("b")).join().map(mget("c")).join()}
+
+
+    var a_b_c = {a:{b:{c:"foo"}}} 
 
     get_a_b_c(a_b_c).map(function(foo){
         assert.equal(foo, "foo", "When all values are present, the routine goes to the end.")
@@ -37,6 +41,22 @@ QUnit.test("Maybe", function(assert){
     assert.equal(funk_executed, false, "When some of the values are not present, the map function is never called.")
 
 })
+
+QUnit.test("Compose", function(assert){
+
+	var get_a_b_c = m.compose(mget("c"), mget("b"), mget("a"))
+
+	var a_b_c = {a:{b:{c:"foo"}}}
+
+    get_a_b_c(o.maybe(a_b_c)).map(function(foo){
+        assert.equal(foo, "foo", "When all values are present, the routine goes to the end.")
+    })
+})
+
+
+
+
+
 
 
 

@@ -1,11 +1,13 @@
 var monads = require("./monads/monads")
+var core = require("./core/core")
+var objects = require("./objects/objects")
 module.exports = {
-	compose:require("./compose"),
-	curry:require("./curry"),
-	map:require("./map"),
-	log:function(a){console.log(a);return a}
+	m:monads,
+	f:core,
+	o:objects
 }
 
 
-window.f = module.exports
+window.f = core
 window.m = monads
+window.o = objects
