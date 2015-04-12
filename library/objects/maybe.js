@@ -1,19 +1,22 @@
 module.exports = {
 	//a -> m a
-	pure:function(input){
-		return {_value:input}
+	of:function(input){
+		this._value = input;
+		return this;
 	},
 	//m a -> ( a -> b ) -> m b
-	map:function(val, funk){
-		new_val = (val._value!==undefined)?funk(val._value):undefined
-		return {_value:new_val}
+	map:function(funk){
+		return this.of((!(this._value instanceof Error))?funk(this._value):this._value)
 	},
 	//m (m x) -> m x
-	join:function(val){
-		var new_val
-		if(val._value!==undefined){
-			var new_val = val._value._value
+	join:function(){
+		if(!(this._value instanceof Error)){
+			if(Object.getPrototypeOf(this) !==Object.getPrototypeOf(this._value)){throw "Illegal join operation."}
+			return this.of(this._value._value)
 		}
-		return {_value:new_val}
+		return this.of(this._value)
 	}
+	
+	//
+	
 }

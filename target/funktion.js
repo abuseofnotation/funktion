@@ -23,7 +23,7 @@ module.exports = {
 	compose:require("./compose"),
 	curry:require("./curry"),
 	map:require("./map"),
-	log:function(a){console.log(a);return a;}
+	id:function(a){return a;}
 }
 
 },{"./compose":1,"./curry":3,"./map":4}],3:[function(require,module,exports){
@@ -104,47 +104,94 @@ module.exports = {
 },{}],10:[function(require,module,exports){
 module.exports = {
 	//a -> m a
-	pure:function(input){
-		return {_value:input}
+	of:function(input){
+		this._value = input;
+		return this;
 	},
 	//m a -> ( a -> b ) -> m b
-	map:function(val, funk){
-		new_val = (val._value!==undefined)?funk(val._value):undefined
-		return {_value:new_val}
+	map:function(funk){
+		return this.of((!(this._value instanceof Error))?funk(this._value):this._value)
 	},
 	//m (m x) -> m x
-	join:function(val){
-		var new_val
-		if(val._value!==undefined){
-			var new_val = val._value._value
+	join:function(){
+		if(!(this._value instanceof Error)){
+			if(Object.getPrototypeOf(this) !==Object.getPrototypeOf(this._value)){throw "Illegal join operation."}
+			return this.of(this._value._value)
 		}
-		return {_value:new_val}
+		return this.of(this._value)
 	}
+	
+	//
+	
 }
 
 },{}],11:[function(require,module,exports){
 var f = require("../core/core")
 function create_type(methods){
-
-	return function(a,b,c,d){return add_methods(methods.pure.apply(this, arguments))}
-
-	function add_methods(monad){
-		monad.map = f.compose(add_methods, methods.map.bind(null, monad))
-		monad.join = f.compose(add_methods, methods.join.bind(null, monad))
-		//monad.chain = monad.bind = c(add_methods, methods.join, methods.map.bind(null, monad))
-		monad.chain = monad.bind = function(funk){if(funk===undefined){throw "function not defined"}; return monad.map(funk).join()}
-
-		return monad;
-	}
+	//Replace the 'of' function with a one that returns a new object
+	var of = methods.of
+	methods.of = function(a,b,c,d){return of.apply(Object.create(methods), arguments)}
 	
+	//"chain" AKA "bind" is equivalent to map . join 
+	if(!methods.bind && typeof methods.map ==="function" && typeof methods.join ==="function"){
+		methods.chain = methods.bind = function(funk){if(funk===undefined){throw "function not defined"}; return this.map(funk).join()}
+	//'map' is equivalent of bind . of
+	}else if(!methods.map && typeof methods.bind ==="function"){
+		methods.map = function(funk){return this.bind()}
+	}
+
+	return methods;
 }
 
 module.exports = {
-	either:create_type(require("./either")),
+	state:create_type(require("./state")),
 	maybe:create_type(require("./maybe")),
 }
 
-},{"../core/core":2,"./either":9,"./maybe":10}]},{},[1,2,3,4,5,6,7,8,9,10,11])
+},{"../core/core":2,"./maybe":10,"./state":12}],12:[function(require,module,exports){
+var f = require("../core/core")
+module.exports = {
+	//a -> m a
+	of:function(input, state){
+		this._value = input;
+		this._state = state||f.id;
+		return this;
+	},
+	//m a -> ( a -> b ) -> m b
+	map:function(funk){
+		return this.of(funk(this._value), this._state)
+	},
+	
+	run:function(){
+		return this._state({})
+	},
+	
+	
+	//m (m x) -> m x
+	/*
+	
+	{
+		_value:{
+			_value:x,
+			_state:s2
+		}
+		state:s1
+	}
+	
+	becomes:
+	
+	{
+		_value:x,
+		state: compose(s1,s2)
+	}
+	
+	*/
+	join:function(){
+		return this.of(this._value._value, f.compose(this._state, this._value._state ))
+	}
+	
+}
+},{"../core/core":2}]},{},[1,2,3,4,5,6,7,8,9,10,11,12])
 
 
 //# sourceMappingURL=funktion.map

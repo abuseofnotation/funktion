@@ -1,20 +1,21 @@
 var f = require("../core/core")
 function create_type(methods){
-
-	return function(a,b,c,d){return add_methods(methods.pure.apply(this, arguments))}
-
-	function add_methods(monad){
-		monad.map = f.compose(add_methods, methods.map.bind(null, monad))
-		monad.join = f.compose(add_methods, methods.join.bind(null, monad))
-		//monad.chain = monad.bind = c(add_methods, methods.join, methods.map.bind(null, monad))
-		monad.chain = monad.bind = function(funk){if(funk===undefined){throw "function not defined"}; return monad.map(funk).join()}
-
-		return monad;
-	}
+	//Replace the 'of' function with a one that returns a new object
+	var of = methods.of
+	methods.of = function(a,b,c,d){return of.apply(Object.create(methods), arguments)}
 	
+	//"chain" AKA "bind" is equivalent to map . join 
+	if(!methods.bind && typeof methods.map ==="function" && typeof methods.join ==="function"){
+		methods.chain = methods.bind = function(funk){if(funk===undefined){throw "function not defined"}; return this.map(funk).join()}
+	//'map' is equivalent of bind . of
+	}else if(!methods.map && typeof methods.bind ==="function"){
+		methods.map = function(funk){return this.bind()}
+	}
+
+	return methods;
 }
 
 module.exports = {
-	either:create_type(require("./either")),
+	state:create_type(require("./state")),
 	maybe:create_type(require("./maybe")),
 }

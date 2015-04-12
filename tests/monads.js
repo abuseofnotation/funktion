@@ -5,7 +5,7 @@ QUnit.module("Monads")
 
 
 var mget = f.curry(function (prop, obj){
-	return o.maybe(obj[prop])   
+	return obj[prop]!==undefined? o.maybe.of(obj[prop]):o.maybe.of(new Error("undefined property"))
 })
 
 var get = f.curry(function (prop, obj){
@@ -18,9 +18,9 @@ QUnit.test("Maybe", function(assert){
 	assert.expect(3)
   // var get_a_b_c = function(obj){ return f.maybe(obj).chain(mget("a")).chain(mget("b")).chain(mget("c"))}
 
-   var get_a_b_c = f.compose(m.bind(mget("c")), m.bind(mget("b")), f.map(get("a")), o.maybe) 
+   var get_a_b_c = f.compose(m.bind(mget("c")), m.bind(mget("b")), f.map(get("a")), o.maybe.of) 
 
-    var get_a_b_c_alt = function(obj){return o.maybe(obj).map(mget("a")).join().map(mget("b")).join().map(mget("c")).join()}
+    var get_a_b_c_alt = function(obj){return o.maybe.of(obj).map(mget("a")).join().map(mget("b")).join().map(mget("c")).join()}
 
 
     var a_b_c = {a:{b:{c:"foo"}}} 
@@ -48,11 +48,22 @@ QUnit.test("Compose", function(assert){
 
 	var a_b_c = {a:{b:{c:"foo"}}}
 
-    get_a_b_c(o.maybe(a_b_c)).map(function(foo){
+    get_a_b_c(o.maybe.of(a_b_c)).map(function(foo){
         assert.equal(foo, "foo", "When all values are present, the routine goes to the end.")
     })
 })
 
+
+QUnit.test("State", function(assert){
+	var write = f.curry(function(key, val, state){ state[key] = val; return state;})
+
+
+	var state = o.state.of(5)
+	.map(function(val){return val+1})
+	.bind(function(val){return o.state.of(val, write("key", val))})
+	.run()
+	assert.deepEqual(state, {key:6})
+})
 
 
 
