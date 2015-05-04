@@ -1,13 +1,16 @@
-var monads = require("./monads/monads")
-var core = require("./core/core")
-var objects = require("./objects/objects")
+var m = require("./m")
+var f = require("./f")
+var may = require("./may")
+var st = require("./st")
 module.exports = {
-	m:monads,
-	f:core,
-	o:objects
+	m:m,
+	f:f,
+	may:may,
+	st:st
 }
 
 
-window.f = core
-window.m = monads
-window.o = objects
+window.f = f
+window.m = m
+window.may = may
+window.st = st 

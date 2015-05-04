@@ -1,9 +1,11 @@
-var f = require("../core/core")
-module.exports = {
+var monads = require("./m")
+var f = require("./f")
+
+var state = monads.make({
 	//a -> m a
 	of:function(input, state){
 		this._value = input;
-		this._state = state||f.id;
+		this._state = state||function(a){return a}
 		return this;
 	},
 	//m a -> ( a -> b ) -> m b
@@ -36,7 +38,17 @@ module.exports = {
 	
 	*/
 	join:function(){
+		if(Object.getPrototypeOf(this) !==Object.getPrototypeOf(this._value)){throw "Illegal join operation.\n"+JSON.stringify(this)+"\n is not the same as \n"+JSON.stringify(this._value)}
 		return this.of(this._value._value, f.compose(this._state, this._value._state ))
 	}
 	
+})
+
+state.run = function(state){
+	return state._state({})
+
 }
+
+state.write = f.curry(function(key, val, state){ state[key] = val; return state;})
+
+module.exports = state
