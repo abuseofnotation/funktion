@@ -1,4 +1,4 @@
-module.exports = function(){
+exports.compose = function(){
 
 	//Convert functions to an array and flip them (for right-to-left execution)
 	var functions = Array.prototype.slice.call(arguments).reverse()
@@ -15,5 +15,13 @@ module.exports = function(){
 			return (i ===0?funk.apply(context, input): funk(return_result))
 			//return (i ===0?funk.apply(context, input): funk.apply(context, [return_result]))
 		}, undefined)
+	}
+}
+
+exports.curry = function curry(funk, initial_arguments){
+	var context = this
+	return function(){  
+		var all_arguments = (initial_arguments||[]).concat(Array.prototype.slice.call(arguments, 0))
+		return all_arguments.length>=funk.length?funk.apply(context, all_arguments):curry(funk, all_arguments)
 	}
 }
