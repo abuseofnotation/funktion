@@ -1,7 +1,7 @@
 
 
 
-QUnit.module("Monads")
+QUnit.module("Maybe")
 
 
 var mget = f.curry(function (prop, obj){
@@ -43,13 +43,14 @@ QUnit.test("Maybe", function(assert){
 })
 
 
-QUnit.test("State", function(assert){
+QUnit.module("State")
+QUnit.test("state", function(assert){
 	
 
 
-	var my_state = st(5)
+	var my_state = state(5)
 	.map(function(val){return val+1})
-	.bind(function(val){return st(val, st.write("key", val))})
+	.bind(function(val){return state(val, state.write("key", val))})
 	.run()
 	assert.deepEqual(my_state, {key:6})
 
@@ -57,20 +58,44 @@ QUnit.test("State", function(assert){
 		return a_state.bind(function(array){
 			if(array.length===0){return a_state}
 			var el = array.pop()
-			return put_input_in_state(st(array, st.write(el, true)))
+			return put_input_in_state(state(array, state.write(el, true)))
 		})
 
 	}
 
-	var unique = f.compose(Object.keys, st.run, put_input_in_state, st)
+	var unique = f.compose(Object.keys, state.run, put_input_in_state, state)
 	assert.deepEqual(unique(["1","2","2","3"]), ["1","2","3"])
+})
+
+QUnit.module("functions")
+
+QUnit.test("map", function(assert){
+	
+	var plus_1 = f(function(num){return num+1})
+	var times_2 = f(function(num){return num*2})
+	var plus_2 = plus_1.map(plus_1) 
+	var plus_4 = plus_2.map(plus_2)
+	
+	assert.equal(plus_2(0), 2, "functions can be composed from other functions.")
+	assert.equal(plus_4(1), 5, "composed functions can be composed again.")
+
+})
+
+
+QUnit.test("curry", function(assert){
+	var add_3 = f(function(a,b,c){return a+b+c})
+	var add_2 = add_3(0)
+	assert.equal(typeof add_2, "function", "curried functions return other functions when the arguments are not enough")
+	assert.equal(add_2(1)(1), 2, "when the arguments are enough a result is returned.")
+	
 })
 
 
 
 
+QUnit.module("Helpers")
 
-QUnit.test("Compose", function(assert){
+QUnit.test("Then compose", function(assert){
 
 	var get_a_b_c = m.then_compose(mget("c"), mget("b"), mget("a"))
 

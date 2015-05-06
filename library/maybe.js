@@ -1,6 +1,6 @@
-monads = require("./m")
+object = require("./object")
 
-maybe = monads.make({
+var maybe = object.create_constructor({
 	//a -> m a
 	of:function(input){
 		this._value = input;

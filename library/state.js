@@ -1,7 +1,8 @@
-var monads = require("./m")
 var f = require("./f")
 
-var state = monads.make({
+object = require("./object")
+
+var state = object.create_constructor({
 	//a -> m a
 	of:function(input, state){
 		this._value = input;
