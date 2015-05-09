@@ -82,6 +82,48 @@ QUnit.test("map", function(assert){
 })
 
 
+QUnit.test("then", function(assert){
+
+	/*
+
+	//The function must do the following (in Haskell terms)
+
+	addStuff = do  
+		a <- (*2)  
+		b <- (+10)  
+		return (a+b)
+	addStuff 3 //19
+
+	//When we desugar it, this becomes:
+
+	addStuff = (*2) >>= \a ->
+			(+10) >>= \b ->
+				return (a+b)
+
+	or...
+
+	*/
+
+	var addStuff = f(function(num){return num * 2}).chain(function(a){
+		return f(function(num){return num + 10}).chain(function(b){
+			return f.of(a + b)
+ 		})
+
+	})
+	
+	
+	var testt = f(function(num){return num * 2})
+ 		.chain(function(a){
+ 			return function(a){
+ 				return a+1
+ 			}
+ 		})
+
+	assert.equal(addStuff(3), 19)
+
+})
+
+
 QUnit.test("curry", function(assert){
 	var add_3 = f(function(a,b,c){return a+b+c})
 	var add_2 = add_3(0)
@@ -89,8 +131,6 @@ QUnit.test("curry", function(assert){
 	assert.equal(add_2(1)(1), 2, "when the arguments are enough a result is returned.")
 	
 })
-
-
 
 
 QUnit.module("Helpers")

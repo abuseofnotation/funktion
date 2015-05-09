@@ -2,7 +2,7 @@ var object = require("./object")
 
 //Function constructor. Takes a function and adds some additional features to it, without extending the prototype
  
-f = function f(funk, initial_arguments){
+var f = function f(funk, initial_arguments){
 
 	//do not do anything if the function takes one argument
 	if(funk.length === 1){return extend(funk, f_methods)}
@@ -24,22 +24,33 @@ function extend(obj, methods){
 
 var f_methods = object.add_missing_methods({
 
+	
+	of:function(val){return function(){return val}},
+
+	// (a -> b).map(b -> c) = a -> c
+
 	map:function map(funk){
 		var original_function = this
 		return f(function(){
 			return funk.call(this, original_function.apply(this, arguments))
 		})
 	},
+	
+	// (a -> b).map(b -> (b -> c)) 
+
+	// (b -> (b -> c)).join() = a -> b
 
 	join:function join (){
-		funk = this
-		return f(function(args){
-			return funk(args)(args)
+		var funk = this
+		return f(function(arg){
+			return funk.apply(this, arguments).apply(this, arguments)
+
 		})
 
 	}
 })
 
+f.of = function(val){return function(){return val}},
 
 f.curry = function curry(funk, initial_arguments){
 

@@ -19,5 +19,17 @@ var add_missing_methods = exports.add_missing_methods = function(obj){
 	}else if(!obj.map && typeof obj.bind ==="function"){
 		obj.map = function(funk){return this.bind(this.of(this))}
 	}
+
+	//"then" can be used both as map and bind (it does map and then does join only if the object returned the same type)
+	obj.then = function(funk){
+		//Do a map
+		var new_obj = this.map(funk)
+
+		//Do a join, if applicable 
+		if(Object.getPrototypeOf(this)=== Object.getPrototypeOf(new_obj)){
+			return new_object
+		}
+	}	
+
 	return obj
 }
