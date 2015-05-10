@@ -1,9 +1,12 @@
 var object = require("./object")
 
 //Function constructor. Takes a function and adds some additional features to it, without extending the prototype
- 
-var f = function f(funk, initial_arguments){
 
+var id = function(a){return a}
+
+
+var f = function f(funk, initial_arguments){
+	funk = funk || id
 	//do not do anything if the function takes one argument
 	if(funk.length === 1){return extend(funk, f_methods)}
 

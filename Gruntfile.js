@@ -42,7 +42,7 @@ module.exports = function(grunt) {
         },
         //Runs a task whenever some of the source files change
         watch: {
-            files: ['tests/*.js', sources],
+            files: ["examples/*",'tests/*.js', sources],
             tasks: ['default']
         },
         //Downloads dependencies
@@ -94,7 +94,8 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    "target/<%= pkg.name %>.js": [sources]
+                    "target/<%= pkg.name %>.js": [sources],
+		    "target/examples.js": ["examples/*"]
                 }
             }
         },
