@@ -42,7 +42,7 @@ module.exports = function(grunt) {
         },
         //Runs a task whenever some of the source files change
         watch: {
-            files: ["examples/*",'tests/*.js', sources],
+            files: ['tests/*.js', sources],
             tasks: ['default']
         },
         //Downloads dependencies
@@ -57,6 +57,13 @@ module.exports = function(grunt) {
         },
 
 
+	literator:{
+		a:{
+			files:{
+				"_posts/api/*":["testlibrary/*"]
+			}
+		}
+	},
 
         exorcise: {
             bundle: {
@@ -94,8 +101,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    "target/<%= pkg.name %>.js": [sources],
-		    "target/examples.js": ["examples/*"]
+                    "target/<%= pkg.name %>.js": [sources]
                 }
             }
         },
@@ -108,6 +114,7 @@ module.exports = function(grunt) {
 
     });
     // load up your plugins
+    grunt.loadTasks('./examples');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-contrib-qunit');

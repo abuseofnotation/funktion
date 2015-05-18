@@ -44,7 +44,11 @@ var process_line = f(function(line){
 
 
 module.exports = function(grunt){
+	grunt.log.writeln("grrr")
 	grunt.registerMultiTask("literator", function(){
+
+			grunt.log.writeln(JSON.stringify(this))
+
 			this.files.forEach(function(file) {
 			file.src.filter(function(filepath) {
 				// Remove nonexistent files (it's up to you to filter or warn here).
@@ -52,6 +56,7 @@ module.exports = function(grunt){
 			})
 			
 			grunt.log.writeln(file)
+			grunt.log.writeln(JSON.stringify(file, undefined, 4))
 
 			//grunt.file.read(filepath);
 			//grunt.file.write(file.dest, contents);

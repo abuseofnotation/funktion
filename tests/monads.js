@@ -67,6 +67,35 @@ QUnit.test("state", function(assert){
 	assert.deepEqual(unique(["1","2","2","3"]), ["1","2","3"])
 })
 
+
+
+QUnit.module("promises")
+
+QUnit.test("then", function(assert){
+	var done = assert.async()
+	var p = promise(function(resolve){
+		setTimeout(function(){resolve(1)}, 1000)
+	})
+	
+	.bind(function(val){  
+		return promise(function(resolve){
+			setTimeout(function(){resolve(val + 1)}, 1000)  
+		})
+	
+	
+	})
+	
+	.map(function(val){
+		assert.equals(val, 2, 'Chained computation returns correct value')
+		done()
+	})
+	console.log(p)
+	p.run()
+	
+
+})
+
+
 QUnit.module("functions")
 
 QUnit.test("map", function(assert){
@@ -80,6 +109,8 @@ QUnit.test("map", function(assert){
 	assert.equal(plus_4(1), 5, "composed functions can be composed again.")
 
 })
+
+
 
 
 QUnit.test("then", function(assert){
