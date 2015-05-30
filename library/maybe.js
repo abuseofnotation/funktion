@@ -1,6 +1,6 @@
-object = require("./object")
+var create_object = require("./object")
 
-var maybe = object.create_constructor({
+var maybe = create_object.create_constructor({
 	//a -> m a
 	of:function(input){
 		this._value = input;

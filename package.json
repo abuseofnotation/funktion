@@ -26,7 +26,8 @@
     "qunitjs": "^1.15.0",
     "grunt-exorcise": "^1.0.0",
     "grunt-docco2": "^0.2.0",
-    "grunt-notify": "^0.4.1"
+    "grunt-notify": "^0.4.1",
+    "babelify": "^6.1.2"
   },
   "keywords": [
     "functional",

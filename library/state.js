@@ -1,6 +1,7 @@
 var f = require("./f")
 
-object = require("./object")
+
+var object = require("./object")
 
 var state = object.create_constructor({
 	//a -> m a
@@ -49,6 +50,8 @@ state.run = function(state){
 	return state._state({})
 
 }
+
+let max = (a, b) => a > b ? a : b;
 
 state.write = f.curry(function(key, val, state){ state[key] = val; return state;})
 

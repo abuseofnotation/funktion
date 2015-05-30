@@ -1,4 +1,4 @@
-var object = require("./object")
+var create_object = require("./object")
 
 //Function constructor. Takes a function and adds some additional features to it, without extending the prototype
 
@@ -25,7 +25,7 @@ function extend(obj, methods){
 	return Object.keys(methods).reduce(function(obj, method_name){obj[method_name] = methods[method_name]; return obj}, obj)
 }
 
-var f_methods = object.add_missing_methods({
+var f_methods = create_object.add_missing_methods({
 
 	
 	of:function(val){return function(){return val}},
@@ -44,9 +44,10 @@ var f_methods = object.add_missing_methods({
 	// (b -> (b -> c)).join() = a -> b
 
 	join:function join (){
-		var funk = this
+		var outer = this
 		return f(function(arg){
-			return funk.apply(this, arguments).apply(this, arguments)
+			var inner = outer.apply(this, arguments)
+			return inner.apply(this, arguments)
 
 		})
 

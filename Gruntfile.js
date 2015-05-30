@@ -57,14 +57,6 @@ module.exports = function(grunt) {
         },
 
 
-	literator:{
-		a:{
-			files:{
-				"_posts/api/*":["testlibrary/*"]
-			}
-		}
-	},
-
         exorcise: {
             bundle: {
                 options: {},
@@ -97,7 +89,8 @@ module.exports = function(grunt) {
             options: {
                 browserifyOptions: {
                     debug: true
-                }
+               },
+	       transform: [["babelify", { "stage": 0 }]]
             },
             dist: {
                 files: {

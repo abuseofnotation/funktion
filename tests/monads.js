@@ -62,8 +62,10 @@ QUnit.test("state", function(assert){
 		})
 
 	}
+	var unique = f().map(state).map(put_input_in_state).map(state.run).map(Object.keys)
 
-	var unique = f.compose(Object.keys, state.run, put_input_in_state, state)
+
+//	var unique = f.compose(Object.keys, state.run, put_input_in_state, state)
 	assert.deepEqual(unique(["1","2","2","3"]), ["1","2","3"])
 })
 
@@ -74,21 +76,25 @@ QUnit.module("promises")
 QUnit.test("then", function(assert){
 	var done = assert.async()
 	var p = promise(function(resolve){
-		setTimeout(function(){resolve(1)}, 1000)
+		setTimeout(function(){
+			resolve(1)
+
+		}, 1000)
 	})
-	
 	.bind(function(val){  
 		return promise(function(resolve){
-			setTimeout(function(){resolve(val + 1)}, 1000)  
+			setTimeout(function(){
+				resolve(val + 1)
+			}, 1000)  
 		})
 	
 	
 	})
-	
 	.map(function(val){
-		assert.equals(val, 2, 'Chained computation returns correct value')
+		assert.equal(val, 2, 'Chained computation returns correct value')
 		done()
 	})
+
 	console.log(p)
 	p.run()
 	

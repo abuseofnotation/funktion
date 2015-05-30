@@ -1,8 +1,8 @@
-object = require("./object")
+var create_object = require("./object")
 
 //var resolver = function(resolve){setTimeout(function(){resolve(1)}, 1000)}
 
-var promise= object.create_constructor({
+var promise= create_object.create_constructor({
 	//a -> m a
 	of:function(resolver){
 		this._resolver = resolver
@@ -19,13 +19,15 @@ var promise= object.create_constructor({
 		})
 
 	},
+
 	//m (m x) -> m x
 	join:function(){
-		var outer_promise = this
-		return promise(function(resolve){
-			return outer_promise.map(function(inner_promise){
-				inner_promise.map(function(val){
-					resolve(val)	
+		var original_promise_resolver = this._resolver
+
+		return this.of(function(resolve_new_promise){
+			original_promise_resolver(function(inner_promise){
+				inner_promise._resolver(function(val){
+					resolve_new_promise(val)	
 				})
 			})
 		})
