@@ -1,4 +1,4 @@
-var create_object = require("./object")
+var create_object = require("./helpers")
 
 var maybe = create_object.create_constructor({
 	//a -> m a

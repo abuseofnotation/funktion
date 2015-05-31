@@ -1,29 +1,33 @@
 
 
-exports.compose = function(){
-
-	//Convert functions to an array and flip them (for right-to-left execution)
-	var functions = Array.prototype.slice.call(arguments).reverse()
-	//Check if input is OK:
-	functions.forEach(function(funk){if(typeof funk !== "function"){throw new TypeError(funk+" is not a function" )}})
-	//Return the function which composes them
-	return function(){
-		//Take the initial input
-		var input = arguments
-		var context
-		return functions.reduce(function(return_result, funk, i){ 
-			//If this is the first iteration, apply the arguments that the user provided
-			//else use the return result from the previous function
-			return (i ===0?funk.apply(context, input): funk(return_result))
-			//return (i ===0?funk.apply(context, input): funk.apply(context, [return_result]))
-		}, undefined)
-	}
+exports.create_constructor = function create_type(methods){
+	//Replace the 'of' function with a one that returns a new object
+	var of = methods.of
+	methods.of = function(a,b,c,d){return of.apply(Object.create(methods), arguments)}
+	
+	methods = add_missing_methods(methods)
+	
+	return methods.of;
 }
 
-exports.curry = function curry(funk, initial_arguments){
-	var context = this
-	return function(){  
-		var all_arguments = (initial_arguments||[]).concat(Array.prototype.slice.call(arguments, 0))
-		return all_arguments.length>=funk.length?funk.apply(context, all_arguments):curry(funk, all_arguments)
+var add_missing_methods = exports.add_missing_methods = function(obj){
+	//"chain" AKA "flatMap" is equivalent to map . join 
+	
+	if(!obj.flatMap && typeof obj.map ==="function" && typeof obj.flat ==="function"){
+		obj.chain = obj.flatMap = function(funk){
+			if(funk===undefined){throw "function not defined"}
+			return this.map(funk).flat()}
 	}
+	/*
+	"then" AKA "XXX" is the relaxed version of "flatMap" which acts on the object only if the types match
+	"XXX" therefore can be used as both "map" and "flatMap", except in the cases when you specifically want to create a nested object.
+	In these cases you can do so by simply using "map" expricitly.
+	*/
+
+	if(!obj.then && typeof obj.map ==="function" && typeof obj.tryFlat ==="function"){
+		obj.then = obj.phatMap = function(funk){
+			if(funk===undefined){throw "function not defined"}
+			return this.map(funk).tryFlat()}
+	}
+	return obj
 }

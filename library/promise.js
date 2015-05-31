@@ -1,4 +1,4 @@
-var create_object = require("./object")
+var create_object = require("./helpers")
 
 //var resolver = function(resolve){setTimeout(function(){resolve(1)}, 1000)}
 

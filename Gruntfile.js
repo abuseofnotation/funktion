@@ -27,6 +27,7 @@ Works with the following project structure.
 
 
 var sources = 'library/**/*.js'
+var tests = 'tests/**/*.js'
 var test_server_port = 8000
 
 module.exports = function(grunt) {
@@ -36,7 +37,7 @@ module.exports = function(grunt) {
         qunit: {
             all: {
                 options: {
-                    urls: ['http://localhost:' + test_server_port + '/tests/index.html']
+                    urls: ['http://localhost:' + test_server_port + '/browsertests/index.html']
                 }
             }
         },
@@ -94,7 +95,8 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    "target/<%= pkg.name %>.js": [sources]
+                    "target/<%= pkg.name %>.js": [sources],
+                    "browsertests/<%= pkg.name %>.js": [tests]
                 }
             }
         },
@@ -107,7 +109,6 @@ module.exports = function(grunt) {
 
     });
     // load up your plugins
-    grunt.loadTasks('./examples');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-contrib-qunit');

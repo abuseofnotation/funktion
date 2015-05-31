@@ -1,58 +1,60 @@
-var create_object = require("./object")
+var helpers = require("./helpers")
 
-//Function constructor. Takes a function and adds some additional features to it, without extending the prototype
+
+var f_methods = helpers.add_missing_methods({
+
+	// a.of(b) -> b a
+	of: val => f( () => val ),
+
+
+	// (a -> b).map(b -> c) = a -> c
+	map: function(funk){ 
+		return f( (...args) => funk( this(...args) ) ) 
+	},
+	
+	
+	// (b -> (b -> c)).join() = a -> b
+	flat:function(){
+		return f( (...args) => this(...args)(...args) ) 
+	},
+
+	tryFlat:function(){
+		return f( (...args) => {
+			var result = this(...args)
+			if(typeof result !== 'function'){
+				return result
+			}else{
+				return result(...args)
+			}
+		}) 
+	}
+
+})
 
 var id = function(a){return a}
 
 
-var f = function f(funk, initial_arguments){
-	funk = funk || id
-	//do not do anything if the function takes one argument
-	if(funk.length === 1){return extend(funk, f_methods)}
-
-	//save context
-	var context = this
-
-	//construct curried function
-	return extend( function(){  
-		var all_arguments = (initial_arguments||[]).concat(Array.prototype.slice.call(arguments, 0))
-		return all_arguments.length>=funk.length?funk.apply(context, all_arguments):f(funk, all_arguments)
-	}, f_methods)
-}
-
-
-function extend(obj, methods){
-	return Object.keys(methods).reduce(function(obj, method_name){obj[method_name] = methods[method_name]; return obj}, obj)
-}
-
-var f_methods = create_object.add_missing_methods({
-
+//Function constructor. Takes a function and adds some additional features to it, without extending the prototype
+var f = (funk = id, initial_arguments) => {
 	
-	of:function(val){return function(){return val}},
-
-	// (a -> b).map(b -> c) = a -> c
-
-	map:function map(funk){
-		var original_function = this
-		return f(function(){
-			return funk.call(this, original_function.apply(this, arguments))
-		})
-	},
+	//We expect a function. If we are given another value, lift it to a function
+	if(typeof funk !== 'function'){
+		return f().of(funk)
 	
-	// (a -> b).map(b -> (b -> c)) 
+	//If the function takes just one argument, just extend it with methods and return it.
+	}else if(funk.length < 2){
+		return extend(funk, f_methods)
 
-	// (b -> (b -> c)).join() = a -> b
-
-	join:function join (){
-		var outer = this
-		return f(function(arg){
-			var inner = outer.apply(this, arguments)
-			return inner.apply(this, arguments)
-
-		})
-
+	//Else, return a curry-capable version of the function (again, extended with the function methods)
+	}else{
+		return extend( (...args) => {
+			var all_arguments  = (initial_arguments||[]).concat(args)	
+			return all_arguments.length>=funk.length?funk(...all_arguments):f(funk, all_arguments)
+		}, f_methods)
+	
 	}
-})
+}
+
 
 f.of = function(val){return function(){return val}},
 
@@ -92,4 +94,8 @@ f.compose = function(){
 	}
 }
 
+
+function extend(obj, methods){
+	return Object.keys(methods).reduce(function(obj, method_name){obj[method_name] = methods[method_name]; return obj}, obj)
+}
 module.exports = f

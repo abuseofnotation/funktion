@@ -49,8 +49,8 @@ QUnit.test("state", function(assert){
 
 
 	var my_state = state(5)
-	.map(function(val){return val+1})
-	.bind(function(val){return state(val, state.write("key", val))})
+	.then(function(val){console.log(1);return val+1})
+	.then(function(val){console.log(2);return state(val, state.write("key", val))})
 	.run()
 	assert.deepEqual(my_state, {key:6})
 
@@ -117,9 +117,24 @@ QUnit.test("map", function(assert){
 })
 
 
+// QUnit.test("then", function(assert){
+// 	assert.expect(0)
 
+// 	f().then(function(input){
+// 		console.log(input)
+// 		return 5
+// 	})
 
-QUnit.test("then", function(assert){
+// 	.then(function(input){
+// 		console.log(input)
+// 		return function(input){
+// 			console.log(input)
+// 			return input +1
+// 		}		
+// 	})(4)
+
+// })
+QUnit.test("chain", function(assert){
 
 	/*
 

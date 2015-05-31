@@ -1,7 +1,7 @@
 var f = require("./f")
 
 
-var object = require("./object")
+var object = require("./helpers")
 
 var state = object.create_constructor({
 	//a -> m a
