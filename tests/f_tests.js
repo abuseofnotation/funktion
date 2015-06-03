@@ -1,3 +1,11 @@
+/*
+---
+category: tutorial
+title: Function Monad
+layout: post
+---
+*/
+
 var f = require("../library/f")
 
 QUnit.module("functions")

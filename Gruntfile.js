@@ -25,6 +25,12 @@ Works with the following project structure.
  
 */
 
+var source_files = ["f"]
+var concat_files = {}
+source_files.forEach(function(name){
+
+	concat_files["_posts/tutorial/2014-3-3"+name] = ["tests/"+name+"_tests.js", "library/"+name+".js", ]
+})
 
 var sources = 'library/**/*.js'
 var tests = 'tests/**/*.js'
@@ -104,8 +110,17 @@ module.exports = function(grunt) {
 		
         jshint: {
             src: [sources]
-        }
-
+        },
+      concat: {
+	basic_and_extras: {
+  	  options:{
+	    process:function(src){
+	    return src.replace(/\/\*/g, "").replace(/\*\//g, "") 
+	    }
+	  },
+	  files: concat_files ,
+	},
+     },
 
     });
     // load up your plugins
@@ -115,9 +130,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     //grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.registerTask('build', ['browserify', "exorcise", 'uglify']);
-    grunt.registerTask('default', ['build', 'test']);
+    grunt.registerTask('default', ['build', 'test', 'concat']);
     grunt.registerTask('test', [/*'jshint',*/ 'connect', 'qunit']);
 };
