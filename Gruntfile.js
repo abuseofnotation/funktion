@@ -29,7 +29,7 @@ var source_files = ["f"]
 var concat_files = {}
 source_files.forEach(function(name){
 
-	concat_files["_posts/tutorial/2014-3-3"+name] = ["tests/"+name+"_tests.js", "library/"+name+".js", ]
+	concat_files["_posts/tutorial/2014-3-3-"+name+".md"] = ["tests/"+name+"_tests.js", "library/"+name+".js" ]
 })
 
 var sources = 'library/**/*.js'
@@ -115,7 +115,14 @@ module.exports = function(grunt) {
 	basic_and_extras: {
   	  options:{
 	    process:function(src){
-	    return src.replace(/\/\*/g, "").replace(/\*\//g, "") 
+	    return src
+	    	//Remove comment symbols
+	    	.replace(/\/\*/g, "")
+		.replace(/\*\//g, "")
+		//Remove everything that sits before the "//--" string
+		.replace(/^.*\/\/--/gm, "")
+		//Remove inline comment symbols at the beggining of a line
+		.replace(/^\/\//gm, "")
 	    }
 	  },
 	  files: concat_files ,

@@ -6,78 +6,114 @@ layout: post
 ---
 */
 
-var f = require("../library/f")
+//The function monad augments standard JavaScript functions with composition and currying.
+//<!--more-->
 
-QUnit.module("functions")
+//To use the monad constructor, you can require it using node:
+		
+		var f = require("../library/f")
 
-QUnit.test("map", function(assert){
+//Where the `../` is the location of the module.
+
+//Then you will be able to construct functions line this
 	
-	var plus_1 = f( (num) => num+1 )
+		var plus_1 = f( (num) => num+1 )
 
-	var times_2 = f( (num) => num*2 )
+	QUnit.module("functions")//--
 
-	var plus_2 = plus_1.map(plus_1) 
-
-	var plus_4 = plus_2.map(plus_2)
-	
-	assert.equal(plus_2(0), 2, "functions can be composed from other functions.")
-	assert.equal(plus_4(1), 5, "composed functions can be composed again.")
-
-})
+//After you do that, you will still be able to use `plus_1` like a normal function, but you can also do the following:
 
 
-QUnit.test("flatMap", function(assert){
+/*
+Currying
+----
+When you call a function `f` with less arguments that it accepts, it returns a partially applied
+(bound) version of itself that may at any time be called with the rest of the arguments.
+*/
 
-	/*
+	QUnit.test("curry", function(assert){//--
+		var add_3 = f(function(a,b,c){return a+b+c})
+		
+		var add_2 = add_3(0)
+		assert.equal(typeof add_2, "function", "curried functions return other functions when the arguments are not enough")
+		
+		assert.equal(add_2(1)(1), 2, "when the arguments are enough a result is returned.")
+	})//--
 
-	//The function must do the following (in Haskell terms)
+/*
+map(funk)
+----
+Creates a new function that calls the original function first, then calls `funk` with the result of the original function as an argument:
+*/
+	QUnit.test("map", function(assert){//--
+		
+//You can create a Function Monad by passing a normal JavaScript function to the constructor (you can write the function directly there):
+		
+		var plus_1 = f( (num) => num+1 )
 
-	addStuff = do  
-		a <- (*2)  
-		b <- (+10)  
-		return (a+b)
-	addStuff 3 //19
 
-	//When we desugar it, this becomes:
+//Then making another funxtion is easy:
 
-	addStuff = (*2) >>= \a ->
-			(+10) >>= \b ->
-				return (a+b)
+		var plus_2 = plus_1.map(plus_1) 
 
-	or...
+		assert.equal(plus_2(0), 2, "New functions can be composed from other functions.")
+		
+		var plus_4 = plus_2.map(plus_2)
 
-	*/
+		assert.equal(plus_4(1), 5, "composed functions can be composed again.")
 
-	var addStuff = f( (num) => num * 2 ).flatMap( (a) =>
-		          f( (num) => num + 10 ).flatMap( (b) =>
-		        	f.of(a + b) ) )
-	
-	assert.equal(addStuff(3), 19)
+	})//--
 
-})
+/*
+flatMap(funk)
+----
+A more powerful version of `map`. Accepts a funktion which returns another function. Returns a function which calls the original function first,
+and then it
+# Calls `funk` with the result of the original function as an argument
+# Calls the function returned by `funk`, with the same argument and returns the result of the second call.
+*/
+	QUnit.test("flatMap", function(assert){//--
 
- QUnit.test("then", function(assert){
- 	assert.expect(0)
+//You can use `flatMap` to model simple if-then statements. The following example uses it in combination of the currying functionality:
+		
+		var concat = f((str1, str2) => str1 + str2)
+		var _parseInt = (num) => parseInt(num)
+		var makeMessage = f(_parseInt).flatMap((num) => {console.log("num "+num); 
+		return isNaN(num)? f("Invalid number") : concat("The number is ")} )
+		
+		assert.equal(makeMessage("1"), "The number is 1")
+		assert.equal(makeMessage("2"), "The number is 2")
+		assert.equal(makeMessage("Not a number"), "Invalid number")
 
- 	f().then(function(input){
- 		console.log(input)
- 		return 5
- 	})
+/*
 
- 	.then(function(input){
- 		console.log(input)
- 		return function(input){
- 			console.log(input)
- 			return input +1
- 		}		
- 	})(4)
+`flatMap` is similar to the `>>=` function in Haskell, which is the building block of the infamous `do` notation
+It can be used to write programs without using assignment.	
 
- })
+For example if we have the following function in Haskell:
 
-QUnit.test("curry", function(assert){
-	var add_3 = f(function(a,b,c){return a+b+c})
-	var add_2 = add_3(0)
-	assert.equal(typeof add_2, "function", "curried functions return other functions when the arguments are not enough")
-	assert.equal(add_2(1)(1), 2, "when the arguments are enough a result is returned.")
-	
-})
+		addStuff = do  
+			a <- (*2)  
+			b <- (+10)  
+			return (a+b)
+		
+		assert.equal(addStuff(3), 19)
+
+
+When we desugar it, this becomes:
+
+		addStuff = (*2) >>= \a ->
+				(+10) >>= \b ->
+					return (a+b)
+
+or in JavaScript terms:
+
+*/
+
+		var addStuff = f( (num) => num * 2 ).flatMap( (a) =>
+				  f( (num) => num + 10 ).flatMap( (b) =>
+					f.of(a + b) ) )
+		
+		assert.equal(addStuff(3), 19)
+
+	})//--
