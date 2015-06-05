@@ -1,48 +1,4 @@
 
-
-
-QUnit.module("Maybe")
-
-
-var mget = f.curry(function (prop, obj){
-	return maybe.from_null(obj[prop])
-})
-
-var get = f.curry(function (prop, obj){
-	return obj[prop]   
-})
-
-
-QUnit.test("Maybe", function(assert){
-	
-	assert.expect(3)
-  // var get_a_b_c = function(obj){ return f.maybe(obj).chain(mget("a")).chain(mget("b")).chain(mget("c"))}
-
-   var get_a_b_c = f.compose(m.bind(mget("c")), m.bind(mget("b")), m.map(get("a")), maybe) 
-
-    var get_a_b_c_alt = function(obj){return maybe(obj).map(mget("a")).join().map(mget("b")).join().map(mget("c")).join()}
-
-
-    var a_b_c = {a:{b:{c:"foo"}}} 
-
-    get_a_b_c(a_b_c).map(function(foo){
-        assert.equal(foo, "foo", "When all values are present, the routine goes to the end.")
-    })
-
-    get_a_b_c_alt(a_b_c).map(function(foo){
-        assert.equal(foo, "foo", "Calling 'chain' is equivalent to calling 'map' and them 'mjoin'.")
-    })
-    
-    var funk_executed = false
-    
-    get_a_b_c({a:{}}).map(function(){
-        funk_executed = true
-    })
-    assert.equal(funk_executed, false, "When some of the values are not present, the map function is never called.")
-
-})
-
-
 QUnit.module("State")
 QUnit.test("state", function(assert){
 	

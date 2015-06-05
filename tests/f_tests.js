@@ -4,14 +4,18 @@ category: tutorial
 title: Function Monad
 layout: post
 ---
-*/
 
-//The function monad augments standard JavaScript functions with composition and currying.
-//<!--more-->
+The function monad augments standard JavaScript functions with composition and currying.
+<!--more-->
+
+*/
+QUnit.module("functions")//--
+
 
 //To use the monad constructor, you can require it using node:
 		
 		var f = require("../library/f")
+		var funktion = require("../library/funktion")
 
 //Where the `../` is the location of the module.
 
@@ -19,7 +23,6 @@ layout: post
 	
 		var plus_1 = f( (num) => num+1 )
 
-	QUnit.module("functions")//--
 
 //After you do that, you will still be able to use `plus_1` like a normal function, but you can also do the following:
 
@@ -43,7 +46,7 @@ When you call a function `f` with less arguments that it accepts, it returns a p
 /*
 map(funk)
 ----
-Creates a new function that calls the original function first, then calls `funk` with the result of the original function as an argument:
+creates a new function that calls the original function first, then calls `funk` with the result of the original function as an argument:
 */
 	QUnit.test("map", function(assert){//--
 		

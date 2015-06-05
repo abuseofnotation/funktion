@@ -1,14 +1,14 @@
 	var helpers = require("./helpers")//--
 
 /*
-Under the Hood
+under the hood
 --------------
-Let's see how the methods are implemented
+Let's see how the type is implemented
 */
 	var f_methods = helpers.add_missing_methods({//--
 
-//The of method, takes a value and creates a function that returns it.
-//This is very useful if you have a API which expects a function, but you want to feed it with a value (see the `flatMap` example). 
+//the `of` method, takes a value and creates a function that returns it.
+//this is very useful if you have a api which expects a function, but you want to feed it with a value (see the `flatmap` example). 
 
 		//a.of(b) -> b a
 		of: val => f( () => val ),
@@ -20,7 +20,9 @@ Let's see how the methods are implemented
 			return f( (...args) => funk( this(...args) ) ) 
 		},
 
-//`flat` does the same thing, but two times
+//`flat` creates a function that: 
+//1. Calls the original function with the supplied arguments
+//2. Calls the resulting function (and it has to be one) with the same arguments
 
 		//(b -> (b -> c)).join() = a -> b
 		flat:function(){
