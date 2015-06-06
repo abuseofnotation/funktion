@@ -17,7 +17,7 @@ Let's see how the type is implemented
 
 		//(a -> b).map(b -> c) = a -> c
 		map: function(funk){ 
-			return f( (...args) => funk( this(...args) ) ) 
+			return f( (...args) => funk( this(...args) ), this._length ) 
 		},
 
 //`flat` creates a function that: 
@@ -26,7 +26,7 @@ Let's see how the type is implemented
 
 		//(b -> (b -> c)).join() = a -> b
 		flat:function(){
-			return f( (...args) => this(...args)(...args) ) 
+			return f( (...args) => this(...args)(...args), this._length ) 
 		},
 
 //finally we have `tryFlat` which does the same thing, but checks the types first. The shortcut to `map().tryFlat()` is called `phatMap` 
@@ -49,23 +49,26 @@ Let's see how the type is implemented
 
 //This is the function constructor. It takes a function and adds an augmented function object, without extending the prototype
 
-	var f = (funk = id, initial_arguments) => {
-		
+	var f = (funk = id, length = funk.length, initial_arguments) => {
+
 		//We expect a function. If we are given another value, lift it to a function
 		if(typeof funk !== 'function'){
 			return f().of(funk)
 		
 		//If the function takes just one argument, just extend it with methods and return it.
-		}else if(funk.length < 2 || initial_arguments === false){
+		}else if ( length < 2 ){
 			return extend(funk, f_methods)
 
 		//Else, return a curry-capable version of the function (again, extended with the function methods)
 		}else{
-			return extend( (...args) => {
+			var extended_funk = extend( (...args) => {
 				var all_arguments  = (initial_arguments||[]).concat(args)	
-				return all_arguments.length>=funk.length?funk(...all_arguments):f(funk, all_arguments)
+				return all_arguments.length>=length?funk(...all_arguments):f(funk, length, all_arguments)
 			}, f_methods)
-		
+			
+			extended_funk._length = length
+
+			return extended_funk
 		}
 	}
 

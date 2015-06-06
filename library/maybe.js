@@ -1,4 +1,4 @@
-var helpers = require("./helpers")
+var helpers = require("./helpers")//--
 /*                                            
 Under the hood                                
 --------------                                
@@ -26,7 +26,7 @@ var maybe_proto = helpers.add_missing_methods({//--
 		}
 	},
 
-//'flat' takes a maybe that contains another maybe and flattens it.
+//`flat` takes a maybe that contains another maybe and flattens it.
 //In this case this means just returning the inner value.
 
 	//m (m x) -> m x
@@ -52,17 +52,18 @@ var maybe_proto = helpers.add_missing_methods({//--
 
 //In case you are interested, here is how the maybe constructor is implemented
 
-var maybe = function(value){
-	if (value === undefined){
-		return nothing
-	}else{
-		var obj = Object.create(maybe_proto)
-		obj._value = value
-		obj.constructor = maybe
-		Object.freeze(obj)
-		return obj
+
+	var maybe = function(value){
+		if (value === undefined){
+			return nothing
+		}else{
+			var obj = Object.create(maybe_proto)
+			obj._value = value
+			obj.constructor = maybe
+			Object.freeze(obj)
+			return obj
+		}
 	}
-}
 
 var nothing = Object.create(maybe_proto)//--
 nothing.constructor = maybe//--

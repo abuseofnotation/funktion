@@ -1,11 +1,11 @@
 /*
 ---
 category: tutorial
-title: maybe monad
+title: maybe
 layout: post
 ---
 
-The `maybe` type, also known as `option` type is a container for a value that may or not be there. 
+The `maybe` type, also known as `option` type is a container for a value that may not be there. 
 
 The purpose of this monad is to eliminate the need for writing `null` checks. furthermore it also eliminates the possibility of making errors by missing null-checks.
 
@@ -33,13 +33,14 @@ map(funk)
 ----
 Executes the function with the `maybe`'s value as an argument, but only if the value is different from *undefined*.
 
+***
 */
 QUnit.test("map", function(assert){//--
 
-//If you have access to a value that may be undefined you have to do a null check before doing something with it:
+//Traditionally, if we have a value that may be undefined we do a null check before doing something with it:
 
 	var obj = {}//--
-	var get_property = f((object) => object.property)
+	var get_property = f((object) => object.property)//--
 	
 	var val = get_property(obj)
 	
@@ -48,49 +49,76 @@ QUnit.test("map", function(assert){//--
 	}
 	assert.equal(val, undefined) 
 
-//However we may easily forget the null check
+//With `map` this can be written like this
+
+ 	var maybe_get_property = get_property.map(maybe)
+
+	maybe_get_property(obj).map((val) => {
+		assert.ok(false)//--
+		val.toString()//this is not executed
+	})
+
+//The biggest benefit we get is that in the first case we can easily forget the null check:
 	
 	assert.throws(function(){
 		get_property(obj).toString()  //this blows up
 	})
-    
-//if you use **maybe** you cannot access the underlying value directly, and therefore you cannot execute an action on it, if it is not there.
 
- 	var maybe_get_property = get_property.map(maybe)
+//While in the second case we cannot access the underlying value directly, and therefore cannot execute an action on it, if it is not there.
 
-	var function_called = false
-	maybe_get_property(obj).map((val) => {
-		assert.ok(false)
-		val.toString()//this is not executed
-	})
 })//--
 
 /*
-flatMap(funk)
+phatMap(funk)
 ----
-Same as map, but allows for nes
 
+Same as `map`, but if `funk` returns a `maybe` it flattens the two `maybes` into one.
+
+***
 */
 
 QUnit.test("flatMap", function(assert){//--
-	var get = f((prop, obj) => obj[prop])
 
-	var obj = { first: {second:{third:"val"} } }
+//`map` works fine for eliminating errors, but does not solve one of the most annoying things there are with null-checks - nesting:
+
+	var obj = { first: {second:"val" } }
 	
 	maybe(obj)
-		.flatMap((obj) => maybe(obj.first))
-		.flatMap((obj) => maybe(obj.second))
-		.flatMap((obj) => maybe(obj.third))
+		.map( (root) => maybe(root.first))
+		.map( (maybeFirst) => maybeFirst.map (first => maybe ( maybeFirst.second ) ) ) 
+		.map( (maybeMaybeValue) => maybeMaybeValue.map ( ( maybeValue) => maybeValue.map( (value)=>( assert.equal( val, "val") ) ) ) )
+
+//`phatMap` does the flattening for us, and allows us to write code like this
+
+	maybe(obj)
+		.flatMap((root) => maybe(root.first))
+		.flatMap((first) => maybe(first.second))
 		.flatMap((val) => {
 			assert.equal(val, "val")
 		})
+
+})//--
+
+/*
+Advanced Usage
+----
+*/
+
+QUnit.test("advanced", function(assert){//--
+// `maybe` can be used with the function monad to effectively produce 'safe' versions of functions
+
+	var get = f((prop, obj) => obj[prop])
+	var maybeGet = get.map(maybe)
+
+//This combined with the use of currying makes for a very fluent style of coding:
+
+	var getFirstSecond = (root) => maybe(root).phatMap(maybeGet('first')).phatMap(maybeGet('second'))
 	
-	var maybe_get = get.map(maybe)
+	getFirstSecond({ first: {second:"value" } }).map((val) => assert.equal(val,"value"))
+	getFirstSecond({ first: {second:"other_value" } }).map((val) => assert.equal(val,"other_value"))
+	getFirstSecond({ first: "" }).map((val) => assert.equal(val,"whatever") )//won't be executed 
 
-
-	
-
-})
+})//--
 
 
 

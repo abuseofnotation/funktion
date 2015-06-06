@@ -1,7 +1,7 @@
 /*
 ---
 category: tutorial
-title: Function Monad
+title: function
 layout: post
 ---
 
