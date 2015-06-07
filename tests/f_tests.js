@@ -1,5 +1,4 @@
-/*
----
+/*---
 category: tutorial
 title: function
 layout: post
@@ -80,8 +79,7 @@ and then it
 //You can use `flatMap` to model simple if-then statements. The following example uses it in combination of the currying functionality:
 		
 		var concat = f((str1, str2) => str1 + str2)
-		var _parseInt = (num) => parseInt(num)
-		var makeMessage = f(_parseInt).flatMap((num) => {console.log("num "+num); 
+		var makeMessage = f(parseInt, 1).flatMap((num) => {console.log("num "+num); 
 		return isNaN(num)? f("Invalid number") : concat("The number is ")} )
 		
 		assert.equal(makeMessage("1"), "The number is 1")

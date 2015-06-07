@@ -25,11 +25,11 @@ Works with the following project structure.
  
 */
 
-var source_files = ["f", "maybe"]
+var source_files = ["f", "maybe", "list"]
 var concat_files = {}
-source_files.forEach(function(name){
+source_files.forEach(function(name, i){
 
-	concat_files["_posts/tutorial/2014-3-3-"+name+".md"] = ["tests/"+name+"_tests.js", "library/"+name+".js" ]
+	concat_files["_posts/tutorial/2014-3-"+(i+1)+"-"+name+".md"] = ["tests/"+name+"_tests.js", "library/"+name+".js" ]
 })
 
 var sources = 'library/**/*.js'
