@@ -30,7 +30,7 @@ QUnit.module("Maybe")//--
 /*
 map(funk)
 ----
-Executes the function with the `maybe`'s value as an argument, but only if the value is different from *undefined*.
+Executes `funk` with the `maybe`'s value as an argument, but only if the value is different from *undefined*, and wraps the result in a new maybe.
 
 ***
 */

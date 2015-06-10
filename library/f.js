@@ -17,6 +17,7 @@ Let's see how the type is implemented
 
 		//(a -> b).map(b -> c) = a -> c
 		map: function(funk){ 
+			if(funk === undefined){throw new TypeError}
 			return f( (...args) => funk( this(...args) ), this._length ) 
 		},
 
@@ -49,7 +50,7 @@ Let's see how the type is implemented
 
 //This is the function constructor. It takes a function and adds an augmented function object, without extending the prototype
 
-	var f = (funk = id, length = funk.length, initial_arguments) => {
+	var f = (funk = id, length = funk.length, initial_arguments = []) => {
 
 		//We expect a function. If we are given another value, lift it to a function
 		if(typeof funk !== 'function'){
@@ -62,11 +63,12 @@ Let's see how the type is implemented
 		//Else, return a curry-capable version of the function (again, extended with the function methods)
 		}else{
 			var extended_funk = extend( (...args) => {
-				var all_arguments  = (initial_arguments||[]).concat(args)	
+				var all_arguments  = (initial_arguments).concat(args)	
 				return all_arguments.length>=length?funk(...all_arguments):f(funk, length, all_arguments)
 			}, f_methods)
 			
-			extended_funk._length = length
+			extended_funk._length = length - initial_arguments.length
+			extended_funk._original = funk
 
 			return extended_funk
 		}

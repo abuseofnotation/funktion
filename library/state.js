@@ -1,28 +1,28 @@
 var f = require("./f")
 
 
-var object = require("./helpers")
+var helpers = require("./helpers")
 
-var state = object.create_constructor({
+var state_proto = helpers.add_missing_methods({
+
+//As usual, the `of` function is trivial
+
 	//a -> m a
-	of:function(input, state){
-		this._value = input;
-		this._state = state||function(a){return a}
-		return this;
+	of:function(input){
+		return state(input)
 	},
+
+//`map` is done by applying the function to the value and keeping the state unchanged.
+
 	//m a -> ( a -> b ) -> m b
 	map:function(funk){
-		return this.of(funk(this._value), this._state)
+		return state(funk(this._value), this._state)
 	},
 	
-	run:function(){
-		return this._state({})
-	},
-	
-	
-	//m (m x) -> m x
+//`flat` looks a little bit difficult, because we have to take care of an extra value,
+//but it is actually nothing more than a function that turns:
+
 	/*
-	
 	{
 		_value:{
 			_value:x,
@@ -31,28 +31,50 @@ var state = object.create_constructor({
 		state:s1
 	}
 	
-	becomes:
+into:
 	
 	{
 		_value:x,
-		state: compose(s1,s2)
+		state: s1 => s2
 	}
 	
 	*/
-	join:function(){
-		if(Object.getPrototypeOf(this) !==Object.getPrototypeOf(this._value)){throw "Illegal join operation.\n"+JSON.stringify(this)+"\n is not the same as \n"+JSON.stringify(this._value)}
-		return this.of(this._value._value, f.compose(this._state, this._value._state ))
+
+	//m (m x) -> m x
+	flat:function(){
+		console.log(this._value._state({}))
+		return state(this._value._value, this._state.map(this._value._state))
+	},
+	tryFlat:function(){
+		
+		if(this._value.prototype === state_proto){
+			
+			return state(this._value._value, this._state.map(this._value._state))
+		}else{
+			return this	
+		}
+	},
+
+//We have the `run` function which computes the state:
+
+	run:function(){
+		return this._state({})
 	}
+	
 	
 })
 
-state.run = function(state){
-	return state._state({})
+//In case you are interested, here is how the state constructor is implemented
 
-}
+	var state = function(value, state){
+		var obj = Object.create(state_proto)
+		obj._value = value
+		obj._state = f(state, 1)
+		obj.constructor = state
+		obj.prototype = state_proto
+		Object.freeze(obj)
+		return obj
+	}
 
-let max = (a, b) => a > b ? a : b;
-
-state.write = f.curry(function(key, val, state){ state[key] = val; return state;})
-
-module.exports = state
+state.write = f(function(key, val, state){ state[key] = val; return state;})
+module.exports = state//--
