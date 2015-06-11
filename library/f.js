@@ -15,7 +15,7 @@ Let's see how the type is implemented
 
 //`map` just wires the original function and the new one together:
 
-		//(a -> b).map(b -> c) = a -> c
+		//(a -> b) => (b -> c) => a -> c
 		map: function(funk){ 
 			if(funk === undefined){throw new TypeError}
 			return f( (...args) => funk( this(...args) ), this._length ) 
@@ -25,7 +25,7 @@ Let's see how the type is implemented
 //1. Calls the original function with the supplied arguments
 //2. Calls the resulting function (and it has to be one) with the same arguments
 
-		//(b -> (b -> c)).join() = a -> b
+		//(b -> (b -> c)) => a -> b
 		flat:function(){
 			return f( (...args) => this(...args)(...args), this._length ) 
 		},

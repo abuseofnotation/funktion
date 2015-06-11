@@ -30,10 +30,10 @@ Executes `funk` with the `state`'s value as an argument, but only if the value i
 */
 QUnit.test("state", function(assert){
 
-	var my_state = state(5)
-	.phatMap((val) => (current_state) => val+1)
-	.phatMap((val) => (current_state) => state(val, state.write("key", val)))
-	.run()
-	assert.deepEqual(my_state, {key:6})
+	var my_state = state().of(5)
+	.map((val) => val+1)
+	.phatMap((val) =>  state((current_state) => [val, state.write("key", val)] ) )
+
+	assert.deepEqual(my_state.get(), {key:6})
 
 })
