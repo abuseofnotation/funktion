@@ -16,7 +16,7 @@ var state_proto = helpers.add_missing_methods({
 
 	//m a -> ( a -> b ) -> m b
 	map:function(funk){
-		return state(funk(this._value), this._state)
+		return state(funk(this._value)(this._state), this._state)
 	},
 	
 //`flat` looks a little bit difficult, because we have to take care of an extra value,

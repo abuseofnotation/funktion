@@ -29,26 +29,11 @@ Executes `funk` with the `state`'s value as an argument, but only if the value i
 ***
 */
 QUnit.test("state", function(assert){
-	
-
 
 	var my_state = state(5)
-	.phatMap(function(val){console.log(1);return val+1})
-	.phatMap(function(val){console.log(2);return state(val, state.write("key", val))})
+	.phatMap((val) => (current_state) => val+1)
+	.phatMap((val) => (current_state) => state(val, state.write("key", val)))
 	.run()
 	assert.deepEqual(my_state, {key:6})
 
-	function put_input_in_state(a_state){
-		return a_state.flatMap(function(array){
-			if(array.length===0){return a_state}
-			var el = array.pop()
-			return put_input_in_state(state(array, state.write(el, true)))
-		})
-
-	}
-	//var unique = f().map(state).map(put_input_in_state).map(state.run).map(Object.keys)
-	var unique = (arr) => Object.keys(put_input_in_state(state(arr)).run())
-
-//	var unique = f.compose(Object.keys, state.run, put_input_in_state, state)
-	assert.deepEqual(unique(["1","2","2","3"]), ["1","2","3"])
 })
