@@ -25,7 +25,7 @@ QUnit.module("List")//--
 		var my_list = list(1,2,3)
 
 /*
-map(funk)
+`map(funk)`
 ----
 Standard array method. Executes `funk` for each of the values in the list and wraps the result in a new list.
 
@@ -39,9 +39,8 @@ QUnit.test("map", function(assert){//--
 })//--
 
 /*
-phatMap(funk)
+`phatMap(funk)`
 ----
-
 Same as `map`, but if `funk` returns a list or an array it flattens the results into one array
 
 ***
@@ -58,4 +57,10 @@ QUnit.test("flatMap", function(assert){//--
 	assert.deepEqual(people,["john", "sam", "charlie", "lisa", "sandra"])
 
 })//--
+/*
+under the hood
+--------------
+Let's see how the type is implemented
+*/
+
 

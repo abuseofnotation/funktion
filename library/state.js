@@ -1,12 +1,11 @@
 
-var f = require("./f")
+const f = require("./f")//--
 
+const helpers = require("./helpers")//--
 
-var helpers = require("./helpers")
+const stateProto = helpers.add_missing_methods({//--
 
-var state_proto = helpers.add_missing_methods({
-
-//As usual, the `of` function is trivial
+//`of` just uses the constructor and does not touch the state.
 
 	//a -> m a
 	of:function(input){
@@ -17,41 +16,77 @@ var state_proto = helpers.add_missing_methods({
 
 	//m a -> ( a -> b ) -> m b
 	map:function(funk){
-		return state( this._state.map(([input, prevState]) => [funk(input), prevState]))
+		return state( this._runState.map(([input, prevState]) => [funk(input), prevState]))
 	},
 	
-//`flat` looks a little bit difficult, because we have to take care of an extra value,
+//`flat` does the following:
+//1. Runs the code that we loaded in the monad so, far (using the `run` function).
+//2. Saves the new state object and the value which is kept by the functions so far.
+//3. After doing that, it arranges those two components (the object and the value) into a yet another
+//state object, which runs the mutator function of the first object, with the state that we have so, far
+
+
 
 	//m (m x) -> m x
 	flat:function(){
-		return  this._state({})[0]
+		//Extract state mutator and value 
+		const [stateObj, currentState] = this.run()
+		//Compose the mutator and the value
+		return state(() => stateObj._runState(currentState) )
 	},
 	tryFlat:function(){
-		return  this._state({})[0]
+
+		//Extract current state 
+		const [stateObj, currentState] = this.run()
+		
+		//Check if it is really a state
+		if(stateObj.constructor === state){
+			return state(() => stateObj._runState(currentState) )
+		}else{
+			return state(() => [stateObj, currentState])
+		}
 	},
 
 //We have the `run` function which computes the state:
 
 	run:function(){
-		return this._state({})[0]
+		return this._runState()
 	},
-	get:function(){
-		return this._state({})[1]({})
+//And the `save` and `load` functions are exactly what one would expect
+
+	load:function(){
+		return this.flatMap( (value) => state( (state) => [state, state] ) )
+	},
+	save:function(){
+		return this.flatMap( (value) => state( (state) => [value, value] ) )
+	},
+	loadKey:function(key){
+		return this.flatMap( (value) => state( (state) => [state[key], state] ) )
+	},
+	saveKey:function(key){
+		const write = (obj, key, val) => {
+			obj = typeof obj === "object" ?  obj : {}
+			obj[key] = val
+			return obj
+		}
+		return this.flatMap( (value) => state( (state) => [value, write(state, key, value)] ) )
+	},
+	toString:function(){
+		return JSON.stringify(this.run())
 	}
-	
 	
 })
 
 //In case you are interested, here is how the state constructor is implemented
 
-	var state = function(state){
-		var obj = Object.create(state_proto)
-		obj._state = f(state, 1)
+	const state = function(run){
+		if(typeof run !== "function"){ return stateProto.of(run) }
+		const obj = Object.create(stateProto)
+		obj._runState = f(run,1)
 		obj.constructor = state
-		obj.prototype = state_proto
+		obj.prototype = stateProto
 		Object.freeze(obj)
 		return obj
 	}
 
-state.write = f(function(key, val, state){ state[key] = val; return state;})
 module.exports = state//--

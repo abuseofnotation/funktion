@@ -25,7 +25,7 @@ Works with the following project structure.
  
 */
 
-var source_files = ["f", "maybe", "list"]
+var source_files = ["f", "maybe", "list", "state"]
 var concat_files = {}
 source_files.forEach(function(name, i){
 

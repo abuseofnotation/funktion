@@ -27,7 +27,12 @@ var add_missing_methods = exports.add_missing_methods = function(obj){
 	obj.then = obj.phatMap = function(funk){
 		if(funk===undefined){throw "function not defined"}
 		return this.map(funk).tryFlat()
-	}
+	},
 	
+	obj.print = function(){
+		console.log(this.toString())
+		return this
+	}
+
 	return obj
 }

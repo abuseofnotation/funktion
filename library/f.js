@@ -1,17 +1,15 @@
 var helpers = require("./helpers")//--
 
-/*
-under the hood
---------------
-Let's see how the type is implemented
-*/
+
+const id = a => a //--
+
 	var f_methods = helpers.add_missing_methods({//--
 
 //the `of` method, takes a value and creates a function that returns it.
-//this is very useful if you have a api which expects a function, but you want to feed it with a value (see the `flatmap` example). 
+//this is very useful if you have a API which expects a function, but you want to feed it with a value (see the `flatmap` example). 
 
 		//a.of(b) -> b a
-		of: val => f( () => val ),
+		of: val => val === undefined ? id : f( () => val ),
 
 //`map` just wires the original function and the new one together:
 
@@ -44,9 +42,6 @@ Let's see how the type is implemented
 		}
 
 	})
-
-	var id = function(a){return a}
-
 
 //This is the function constructor. It takes a function and adds an augmented function object, without extending the prototype
 

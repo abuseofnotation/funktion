@@ -2,11 +2,6 @@
 
 var helpers = require("./helpers")//--
 
-/*
-under the hood
---------------
-Let's see how the type is implemented
-*/
 var list_methods = helpers.add_missing_methods({//--
 
 //the `of` method, takes a value and puts it in a list.

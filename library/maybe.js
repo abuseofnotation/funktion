@@ -1,10 +1,4 @@
 var helpers = require("./helpers")//--
-/*                                            
-Under the hood                                
---------------                                
-Let's see how this type is implemented     
-*/                                            
-
 var maybe_proto = helpers.add_missing_methods({//--
 
 //the `of` method, takes a value and wraps it in a `maybe`.
