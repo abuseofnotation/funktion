@@ -1,7 +1,7 @@
 var helpers = require("./helpers")//--
 var maybe_proto = helpers.add_missing_methods({//--
 
-//the `of` method, takes a value and wraps it in a `maybe`.
+//The `of` method, takes a value and wraps it in a `maybe`.
 //In this case we do this by just calling the constructor.
 
 	//a -> m a

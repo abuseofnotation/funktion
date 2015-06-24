@@ -6,7 +6,8 @@ layout: post
 
 The `maybe` type, also known as `option` type is a container for a value that may not be there. 
 
-The purpose of this monad is to eliminate the need for writing `null` checks. furthermore it also eliminates the possibility of making errors by missing null-checks.
+The purpose of this monad is to eliminate the need for writing `null` checks. 
+Furthermore it also eliminates the possibility of making errors by missing null-checks.
 
 <!--more-->
 */
