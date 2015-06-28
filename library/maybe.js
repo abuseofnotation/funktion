@@ -40,7 +40,25 @@ var maybe_proto = helpers.add_missing_methods({//--
 		}else{
 			return this
 		}
+	},
+	
+	funktionType:"maybe",//--
+
+//Finally, the type has some helper functions:
+
+	filter:function(funk){
+		return funk(this._value) ? this : nothing
+	},
+
+	reduce:function(funk){
+		return funk(this._value)
+	},
+
+	get:function(prop){
+		return maybe(this._value[prop])
 	}
+
+
 	
 })//--
 

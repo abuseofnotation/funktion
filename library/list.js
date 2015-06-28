@@ -2,17 +2,14 @@
 
 var helpers = require("./helpers")//--
 
-var list_methods = helpers.add_missing_methods({//--
+var listMethods = helpers.add_missing_methods({//--
 
 //the `of` method, takes a value and puts it in a list.
 
 		//a.of(b) -> b a
 		of: val => list(val),
 
-//`map` applies a function to each element of the list 
-		map:function(funk){
-			return list(Array.prototype.map.call(this, funk))
-		},
+//`map` applies a function to each element of the list, as the one from the Array prototype
 		
 //`flat` takes a list of lists and flattens them with one level 
 
@@ -28,24 +25,48 @@ var list_methods = helpers.add_missing_methods({//--
 			return list( this.reduce((list, element) => 
 				element.constructor === Array? [...list, ...element] : [...list, element] , [])
 			)
-		}
+		},
+		funktionType:"list"//--
 
 	})
 
-//This is the list constructor. It takes normal array and augments it with the above methods
+//Some functions are directly lifted from the Array prototype
 
+var immutableFunctions = ['map', 'concat']
+
+immutableFunctions.forEach((funk) => { 
+	listMethods[funk] = function(...args){
+			return list(Array.prototype[funk].apply(this, args))
+	}
+})
+
+//The type also wraps some Array functions in a way that makes them immutable
+
+var mutableFunctions = ['splice', 'reverse', 'sort']
+
+mutableFunctions.forEach((funk) => { 
+	listMethods[funk] = function(...args){
+			var newArray = this.slice(0)
+			Array.prototype[funk].apply(newArray, args)
+			return newArray
+	}
+})
+
+//This is the list constructor. It takes normal array and augments it with the above methods
+	
 	var list = (...args) => {
+		if(args.length === 1 && args[0].funktionType === "list"){
+			return args[0]
 		//Accept an array
-		if(args.length === 1 && args[0].constructor === Array ){
-			return  Object.freeze(extend(args[0], list_methods))
+		}else if(args.length === 1 && args[0].constructor === Array ){
+			return  Object.freeze(extend(args[0], listMethods))
 		//Accept several arguments
 		}else{
-			return Object.freeze(extend(args, list_methods))
+			return Object.freeze(extend(args, listMethods))
 		}
 	}
 
 //Here is the function with which the list object is extended
-
 	function extend(obj, methods){
 		return Object.keys(methods).reduce(function(obj, method_name){obj[method_name] = methods[method_name]; return obj}, obj)
 	}
