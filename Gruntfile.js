@@ -25,7 +25,7 @@ Works with the following project structure.
  
 */
 
-var source_files = ["f", "maybe", "list", "state"].reverse()
+var source_files = ["f", "maybe", "list", "state", "promise"].reverse()
 var concat_files = {}
 source_files.forEach(function(name, i){
 

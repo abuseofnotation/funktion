@@ -19,7 +19,7 @@ var promiseProto = helpers.add_missing_methods({//--
 
 //In this case the implementation of `flat` is quite simple.
 
-//Effectively all we have to do is return the same value with which the inner promise is resolved.
+//Effectively all we have to do is return the same value with which the inner promise is resolved with.
 //To do this, we unwrap our promise once to get the inner promise value, and then unwrap the inner
 //promise itself to get its value.
 
@@ -29,6 +29,21 @@ var promiseProto = helpers.add_missing_methods({//--
 			this._resolver(	(inner_promise) => 
 				inner_promise._resolver((val) => resolve(val))
 			) 
+		)
+	},
+
+//The `tryFlat` function is almost the same:
+
+	//m (m x) -> m x
+	tryFlat:function(){
+		return promise( (resolve) => 
+			this._resolver(	(inner_promise) => { 
+				if(inner_promise.constructor === promise){
+					inner_promise._resolver((val) => resolve(val))
+				}else{
+					resolve(inner_promise)
+				}
+			}) 
 		)
 	},
 
