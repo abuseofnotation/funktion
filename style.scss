@@ -27,6 +27,7 @@ body {
   margin: 0 auto;
   padding: 20px;
   width: 100%;
+  color: #375C7F;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -153,6 +154,7 @@ img {
 
 .wrapper-masthead {
   margin-bottom: 0px;
+  background-color: #375C7F;
 }
 
 .masthead {
@@ -189,13 +191,16 @@ img {
     display: block;
     margin: 0 auto;
   }
+
+  h1 {
+    color:#fff;
+  }
 }
 
 .site-name {
   margin: 0;
   color: $darkGray;
   cursor: pointer;
-  font-weight: 300;
   font-size: 62px;
   font-family: 'Source Code Pro', monospace;
   letter-spacing: 1px;
@@ -226,7 +231,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: #fff;
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
