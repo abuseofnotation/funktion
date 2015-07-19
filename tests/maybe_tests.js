@@ -120,7 +120,6 @@ QUnit.test("advanced", function(assert){//--
 
 })//--
 
-
 /*
 under the hood
 --------------

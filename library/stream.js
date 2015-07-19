@@ -1,5 +1,5 @@
 var helpers = require("./helpers")//--
-var streamProto = helpers.add_missing_methods({//--
+var methods = {//--
 
 //The `of` method takes a value and wraps it in a stream, by immediately calling the pusher function with it.
 
@@ -81,17 +81,24 @@ var streamProto = helpers.add_missing_methods({//--
 			accumulator = funk(accumulator, val) 
 		})
 	},
-})//--
+}//--
+
+//Add aliases to map . flat as flatMap and map . tryFlat as phatMap
+        methods.flatMap = helpers.flatMap
+        methods.phatMap = helpers.phatMap
+
+//Add a print function, used for debugging.
+        methods.print = helpers.print
 
 //In case you are interested, here is how the stream constructor is implemented
 
 	const stream = function(push){
-		if(typeof push !== "function"){ return streamProto.of(push) }
-		const obj = Object.create(streamProto)
+		if(typeof push !== "function"){ return methods.of(push) }
+		const obj = Object.create(methods)
 
 		obj._pusher = push
 		obj.constructor = stream
-		obj.prototype = streamProto
+		obj.prototype = methods
 		Object.freeze(obj)
 		return obj
 	}

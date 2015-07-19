@@ -178,15 +178,22 @@ start executing.
 	
 
 
+Add aliases to map . flat as flatMap and map . tryFlat as phatMap
+        methods.flatMap = helpers.flatMap
+        methods.phatMap = helpers.phatMap
+
+Add a print function, used for debugging.
+        methods.print = helpers.print
+
 In case you are interested, here is how the promise constructor is implemented
 
 	const promise = function(resolve){
-		if(typeof resolve !== "function"){ return promiseProto.of(resolve) }
-		const obj = Object.create(promiseProto)
+		if(typeof resolve !== "function"){ return methods.of(resolve) }
+		const obj = Object.create(methods)
 
 		obj._resolver = resolve
 		obj.constructor = promise
-		obj.prototype = promiseProto
+		obj.prototype = methods
 		Object.freeze(obj)
 		return obj
 	}

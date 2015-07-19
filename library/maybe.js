@@ -1,5 +1,5 @@
 var helpers = require("./helpers")//--
-var maybe_proto = helpers.add_missing_methods({//--
+var methods = {//--
 
 //The `of` method, takes a value and wraps it in a `maybe`.
 //In this case we do this by just calling the constructor.
@@ -35,7 +35,7 @@ var maybe_proto = helpers.add_missing_methods({//--
 //finally we have `tryFlat` which does the same thing, but checks the types first. The shortcut to `map().tryFlat()` is called `phatMap` 
 
 	tryFlat:function(){
-		if(this !== nothing && this._value.constructor === maybe){
+		if(this !== nothing && this._value.funktionType === "maybe"){
 			return this._value
 		}else{
 			return this
@@ -46,21 +46,31 @@ var maybe_proto = helpers.add_missing_methods({//--
 
 //Finally, the type has some helper functions:
 
-	filter:function(funk){
+	filter:function filter (funk){
 		return funk(this._value) ? this : nothing
 	},
 
-	reduce:function(funk){
+	reduce:function reduce (funk){
 		return funk(this._value)
 	},
 
-	get:function(prop){
-		return maybe(this._value[prop])
-	}
+	get:function get (prop){
+		return maybe(this.map( (val) => val[prop] ))
+	},
 
 
 	
-})//--
+    }//--
+
+methods.extras = [methods.get, methods.filter]
+
+//Add aliases to map . flat as flatMap and map . tryFlat as phatMap
+        methods.flatMap = helpers.flatMap
+        methods.phatMap = helpers.phatMap
+
+//Add a print function, used for debugging.
+        methods.print = helpers.print
+
 
 //In case you are interested, here is how the maybe constructor is implemented
 
@@ -69,7 +79,7 @@ var maybe_proto = helpers.add_missing_methods({//--
 		if (value === undefined){
 			return nothing
 		}else{
-			var obj = Object.create(maybe_proto)
+			var obj = Object.create(methods)
 			obj._value = value
 			obj.constructor = maybe
 			Object.freeze(obj)
@@ -77,9 +87,10 @@ var maybe_proto = helpers.add_missing_methods({//--
 		}
 	}
 
-var nothing = Object.create(maybe_proto)//--
+var nothing = Object.create(methods)//--
 nothing.constructor = maybe//--
 Object.freeze(nothing)//--
 maybe.nothing = nothing//--
 
+maybe.prototype = methods
 module.exports = maybe//--

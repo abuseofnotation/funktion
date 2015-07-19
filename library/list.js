@@ -2,7 +2,7 @@
 
 var helpers = require("./helpers")//--
 
-var listMethods = helpers.add_missing_methods({//--
+var methods = {//--
 
 //the `of` method, takes a value and puts it in a list.
 
@@ -28,14 +28,26 @@ var listMethods = helpers.add_missing_methods({//--
 		},
 		funktionType:"list"//--
 
-	})
+	}//--
+
+//Add aliases to map . flat as flatMap and map . tryFlat as phatMap
+        methods.flatMap = helpers.flatMap
+        methods.phatMap = helpers.phatMap
+
+//Add a print function, used for debugging.
+        methods.print = helpers.print
+
+
+//Add support for array extras, so that they return a list instead of normal Array
+
+methods.extras = {}
 
 //Some functions are directly lifted from the Array prototype
 
 var immutableFunctions = ['map', 'concat']
 
 immutableFunctions.forEach((funk) => { 
-	listMethods[funk] = function(...args){
+	methods.extras[funk] = function(...args){
 			return list(Array.prototype[funk].apply(this, args))
 	}
 })
@@ -45,12 +57,14 @@ immutableFunctions.forEach((funk) => {
 var mutableFunctions = ['splice', 'reverse', 'sort']
 
 mutableFunctions.forEach((funk) => { 
-	listMethods[funk] = function(...args){
+	methods.extras[funk] = function(...args){
 			var newArray = this.slice(0)
 			Array.prototype[funk].apply(newArray, args)
 			return newArray
 	}
 })
+
+extend(methods, methods.extras)
 
 //This is the list constructor. It takes normal array and augments it with the above methods
 	
@@ -59,10 +73,10 @@ mutableFunctions.forEach((funk) => {
 			return args[0]
 		//Accept an array
 		}else if(args.length === 1 && args[0].constructor === Array ){
-			return  Object.freeze(extend(args[0], listMethods))
+			return  Object.freeze(extend(args[0], methods))
 		//Accept several arguments
 		}else{
-			return Object.freeze(extend(args, listMethods))
+			return Object.freeze(extend(args, methods))
 		}
 	}
 

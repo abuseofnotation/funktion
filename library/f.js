@@ -3,7 +3,7 @@ var helpers = require("./helpers")//--
 
 const id = a => a //--
 
-	var f_methods = helpers.add_missing_methods({//--
+	var methods = {//--
 
 //the `of` method, takes a value and creates a function that returns it.
 //this is very useful if you have a API which expects a function, but you want to feed it with a value (see the `flatmap` example). 
@@ -41,7 +41,14 @@ const id = a => a //--
 			}) 
 		}
 
-	})
+	}//--
+
+//Add aliases to map . flat as flatMap and map . tryFlat as phatMap
+        methods.flatMap = helpers.flatMap
+        methods.phatMap = helpers.phatMap
+
+//Add a print function, used for debugging.
+        methods.print = helpers.print
 
 //This is the function constructor. It takes a function and adds an augmented function object, without extending the prototype
 
@@ -53,14 +60,14 @@ const id = a => a //--
 		
 		//If the function takes just one argument, just extend it with methods and return it.
 		}else if ( length < 2 ){
-			return extend(funk, f_methods)
+			return extend(funk, methods)
 
 		//Else, return a curry-capable version of the function (again, extended with the function methods)
 		}else{
 			var extended_funk = extend( (...args) => {
 				var all_arguments  = (initial_arguments).concat(args)	
 				return all_arguments.length>=length?funk(...all_arguments):f(funk, length, all_arguments)
-			}, f_methods)
+			}, methods)
 			
 			extended_funk._length = length - initial_arguments.length
 			extended_funk._original = funk

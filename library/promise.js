@@ -1,5 +1,5 @@
 var helpers = require("./helpers")//--
-var promiseProto = helpers.add_missing_methods({//--
+var methods = {//--
 
 //The `of` method takes a value and wraps it in a promise, by immediately calling the resolver function with it.
 
@@ -54,17 +54,24 @@ var promiseProto = helpers.add_missing_methods({//--
 		return this._resolver(function(a){return a})
 	}
 	
-})//--
+    }//--
+
+//Add aliases to map . flat as flatMap and map . tryFlat as phatMap
+        methods.flatMap = helpers.flatMap
+        methods.phatMap = helpers.phatMap
+
+//Add a print function, used for debugging.
+        methods.print = helpers.print
 
 //In case you are interested, here is how the promise constructor is implemented
 
 	const promise = function(resolve){
-		if(typeof resolve !== "function"){ return promiseProto.of(resolve) }
-		const obj = Object.create(promiseProto)
+		if(typeof resolve !== "function"){ return methods.of(resolve) }
+		const obj = Object.create(methods)
 
 		obj._resolver = resolve
 		obj.constructor = promise
-		obj.prototype = promiseProto
+		obj.prototype = methods
 		Object.freeze(obj)
 		return obj
 	}
