@@ -55,13 +55,13 @@ const methods = {//--
 //And the `save` and `load` functions are exactly what one would expect
 
 	load:function(){
-		return this.flatMap( (value) => state( (state) => [state, state] ) )
+		return this.flatMap( (value) => this.constructor( (state) => [state, state] ) )
 	},
 	save:function(){
-		return this.flatMap( (value) => state( (state) => [value, value] ) )
+		return this.flatMap( (value) => this.constructor( (state) => [value, value] ) )
 	},
 	loadKey:function(key){
-		return this.flatMap( (value) => state( (state) => [state[key], state] ) )
+		return this.flatMap( (value) => this.constructor( (state) => [state[key], state] ) )
 	},
 	saveKey:function(key){
 		const write = (obj, key, val) => {
@@ -69,7 +69,7 @@ const methods = {//--
 			obj[key] = val
 			return obj
 		}
-		return this.flatMap( (value) => state( (state) => [value, write(state, key, value)] ) )
+		return this.flatMap( (value) => this.constructor( (state) => [value, write(state, key, value)] ) )
 	}
 	
     }//--
@@ -83,11 +83,10 @@ const methods = {//--
 
 //In case you are interested, here is how the state constructor is implemented
 
-	const state = function(run){
+	const state = methods.constructor = function(run){
 		if(typeof run !== "function"){ return methods.of(run) }
 		const obj = Object.create(methods)
 		obj._runState = f(run,1)
-		obj.constructor = state
 		obj.prototype = methods
 		Object.freeze(obj)
 		return obj

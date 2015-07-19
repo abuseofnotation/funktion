@@ -40,14 +40,14 @@ var methods = {//--
 
 //Add support for array extras, so that they return a list instead of normal Array
 
-methods.extras = {}
+var arrayMethods = {}
 
 //Some functions are directly lifted from the Array prototype
 
 var immutableFunctions = ['map', 'concat']
 
 immutableFunctions.forEach((funk) => { 
-	methods.extras[funk] = function(...args){
+	arrayMethods[funk] = function(...args){
 			return list(Array.prototype[funk].apply(this, args))
 	}
 })
@@ -57,14 +57,16 @@ immutableFunctions.forEach((funk) => {
 var mutableFunctions = ['splice', 'reverse', 'sort']
 
 mutableFunctions.forEach((funk) => { 
-	methods.extras[funk] = function(...args){
+	arrayMethods[funk] = function(...args){
 			var newArray = this.slice(0)
 			Array.prototype[funk].apply(newArray, args)
 			return newArray
 	}
 })
 
-extend(methods, methods.extras)
+extend(methods, arrayMethods)
+
+methods.extras = []
 
 //This is the list constructor. It takes normal array and augments it with the above methods
 	

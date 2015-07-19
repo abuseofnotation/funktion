@@ -1,10 +1,19 @@
 var maybeT = require("../library/maybeT")
 var list = require("../library/list")
+var state = require("../library/state")
 
 QUnit.module("maybeT")
 
-QUnit.test("map", function(assert){//--
-    const maybeList = maybeT(list(1,2,3))
-    assert.expect(1)
-    assert.deepEqual(maybeT(list({a:"b"}, {a:"c"})).get("a")._value._value, ["b", "c"])
+QUnit.test("list", function(assert){//--
+    var bc = maybeT(list({a:"b"}, {a:"c"})).getProp("a")
+    assert.deepEqual(bc._value, ["b", "c"])
+    var abc = bc.lift("reverse").lift("concat", ["a"])
+    assert.deepEqual(abc._value, ["c", "b", "a"])
 })
+/*
+QUnit.test("state", function(assert){//--
+    maybeT(state(1))
+    .map()
+})
+
+*/
