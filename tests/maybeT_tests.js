@@ -6,9 +6,9 @@ QUnit.module("maybeT")
 
 QUnit.test("list", function(assert){//--
     var bc = maybeT(list({a:"b"}, {a:"c"})).getProp("a")
-    assert.deepEqual(bc._value, ["b", "c"])
+    assert.deepEqual(bc._innerMonad, ["b", "c"])
     var abc = bc.lift("reverse").lift("concat", ["a"])
-    assert.deepEqual(abc._value, ["c", "b", "a"])
+    assert.deepEqual(abc._innerMonad, ["c", "b", "a"])
 })
 /*
 QUnit.test("state", function(assert){//--

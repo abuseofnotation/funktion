@@ -23,7 +23,7 @@ var methods = {//--
 
 		tryFlat:function(){
 			return list( this.reduce((list, element) => 
-				element.constructor === Array? [...list, ...element] : [...list, element] , [])
+				element !== undefined && element.constructor === Array? [...list, ...element] : [...list, element] , [])
 			)
 		},
 		funktionType:"list"//--

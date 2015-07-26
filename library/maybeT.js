@@ -1,74 +1,54 @@
-var helpers = require("./helpers")//--
-var maybe = require("./maybe")//--
-var methods = {//--
+        var helpers = require("./helpers")//--
+        var maybe = require("./maybe")//--
+        var methods = Object.create(maybe.prototype)
 
-//The `of` method, takes a value and wraps it in a `maybe`.
-//In this case we do this by just calling the constructor.
 
-	//a -> m a
-	of:function(input){
-            return maybeT(input)
-	},
-
-//`map` takes the function and applies it to the value in the maybe, if there is one.
+	var maybeT = function(value){
+                var obj = Object.create(methods)
+                obj._innerMonad = value
+                return Object.freeze(obj)
+	}
+        
+	methods.funktionType = "maybeT"//--
+        methods.constructor = maybeT
 
 	//m maybe a -> ( a -> maybe b ) -> m maybe b
-	map:function(funk){
-            return maybeT( this._value.map((val) => {
-               return val === undefined? val:funk(val)
-            }) )
-	},
+	methods.map = function map (funk){
+            return maybeT( this._innerMonad.map((val) => 
+               val === undefined ? val : funk(val)
+            ) )
+	}
 
 //`flat` takes a maybe that contains another maybe and flattens it.
 //In this case this means just returning the inner value.
 
 	//m (m x) -> m x
-	flat:function(){
-            return maybeT(this._value.map( (val) =>{
-			return val._value
-            }))
-	},
+	methods.flat = function flat (){
+            return maybeT(this._innerMonad.map( (innerMaybeT) =>
+               innerMaybeT === undefined ? this._innerMonad.of(undefined) : innerMaybeT._innerMonad 
+            ).flat())
+	}
 
 //finally we have `tryFlat` which does the same thing, but checks the types first. The shortcut to `map().tryFlat()` is called `phatMap` 
 
-	tryFlat:function(){
-            return maybeT(this._value.map( (val) =>{
-		if(val.funktionType === "maybeT"){
-			return val._value
+	methods.tryFlat=function tryFlat (){
+            return maybeT(this._innerMonad.map( (innerMaybeT) =>{
+		if(innerMaybeT === undefined){
+			return this._innerMonad.of(undefined)
+		}else if(innerMaybeT.funktionType === "maybeT"){
+			return innerMaybeT._innerMonad
 		}else{
-			return val
-		}
-            }))
-	},
-        lift:function(funk, ...args){
-            if(typeof funk === 'function'){
-                return maybeT(funk(this._value))
-            }else if (typeof funk === 'string'){
-                return maybeT(this._value[funk](...args))
-            }        
-        },	
-	funktionType:"maybeT"//--
-	
-    }//--
-
-//In case you are interested, here is how the maybe constructor is implemented
-    maybe.prototype.extras.forEach((method) => {
-        methods[method.name] = method
-    })
-
-//Add aliases to map . flat as flatMap and map . tryFlat as phatMap
-        methods.flatMap = helpers.flatMap
-        methods.phatMap = helpers.phatMap
-
-//Add a print function, used for debugging.
-        methods.print = helpers.print
-
-	var maybeT = function(monadValue){
-                var obj = Object.create(methods)
-                obj._value = monadValue
-                obj.constructor = maybeT
-                Object.freeze(obj)
-                return obj
+                        return this._innerMaybeT
+                }
+            }).tryFlat())
 	}
 
-module.exports = maybeT//--
+        methods.lift = function(funk, ...args){
+            if(typeof funk === 'function'){
+                return maybeT(funk(this._innerMonad))
+            }else if (typeof funk === 'string'){
+                return maybeT(this._innerMonad[funk](...args))
+            }        
+        }	
+
+        module.exports = maybeT//--

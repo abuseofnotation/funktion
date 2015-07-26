@@ -11,23 +11,33 @@ Furthermore it also eliminates the possibility of making errors by missing null-
 
 <!--more-->
 */
-QUnit.module("Maybe")//--
 
+var identity = require("../library/identity")//--
+var f = require("../library/f")//--
+var list = require("../library/list")//--
+var state = require("../library/state")//--
 
 
 //To use the `maybe` monad constructor, you can require it using node:
 		
-		var maybe = require("../library/maybe")
-		var f = require("../library/f")//--
+    var maybe = require("../library/maybe")
 
 //Where the `../` is the location of the module.
 
 //Then you will be able to wrap a value in `maybe` with:
-		var val = 4//--
-		var maybe_val = maybe(val)
+    var val = 4//--
+    var maybe_val = maybe(val)
 
 //If the 'val' is equal to *undefined* it threats the container as empty.
 
+
+//You can also combine a `maybe` with an existing monad, using the `maybeT` constructor:
+
+    var maybeT = require("../library/maybeT")
+    const maybeList = maybeT(list(1,2,3))
+
+
+var test = (maybe)=>{//--
 /*
 `map(funk)`
 ----
@@ -52,7 +62,6 @@ QUnit.test("map", function(assert){//--
 //With `map` this can be written like this
 
  	var maybe_get_property = get_property.map(maybe)
-
 	maybe_get_property(obj).map((val) => {
 		assert.ok(false)//--
 		val.toString()//this is not executed
@@ -119,6 +128,56 @@ QUnit.test("advanced", function(assert){//--
 	getFirstSecond({ first: "" }).map((val) => assert.equal(val,"whatever") )//won't be executed 
 
 })//--
+
+}//--
+QUnit.module("Maybe")//--
+test(maybe)//-- run the tests using a maybe
+QUnit.module("MaybeT")//-- run the tests using a monad transformer
+test((val)=>maybeT(identity(val)))//--
+
+    
+/*
+Combining with Other Monads
+----
+In addition to creating a `maybe` from a plain value, you can also create one from an existing monad, using the `maybeT` constructor:
+
+The resulting monad will gain all the characteristics of a `maybe` without losing the characteristics of the underlying monad.
+
+***
+*/
+    
+QUnit.module("maybeT Combinations")//--
+
+
+QUnit.test("list", function(assert){//--
+
+//Combining a maybe with a list, for example, creates a list where each of the values are `maybe`s
+
+    var maybeList = maybeT(list({first:{ second:"value" } }, {first:{ second:"other value" } }, { first:""} ))
+
+//This means you can use maybe to safely transform the list items:
+
+    maybeList.phatMap((val)=> maybeT(val.first) ).phatMap((val)=> maybeT(val.second) )
+
+//This allows you to use a function that returns a maybe 
+
+
+
+//You can use the maybe
+
+    .getProp("a")
+    assert.deepEqual(bc._innerMonad, ["b", "c"])
+    var abc = bc.lift("reverse").lift("concat", ["a"])
+    assert.deepEqual(abc._innerMonad, ["c", "b", "a"])
+})//--
+/*
+QUnit.test("state", function(assert){//--
+    maybeT(state(1))
+    .map()
+})
+
+*/
+
 
 /*
 under the hood
