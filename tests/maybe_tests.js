@@ -39,6 +39,9 @@ var state = require("../library/state")//--
 
 var test = (maybe)=>{//--
 /*
+Basic Methods
+---
+
 `map(funk)`
 ----
 Executes `funk` with the `maybe`'s value as an argument, but only if the value is different from *undefined*, and wraps the result in a new maybe.
@@ -109,6 +112,17 @@ QUnit.test("flatMap", function(assert){//--
 })//--
 
 /*
+Helpers
+----
+
+`getProp(propName)`
+----
+Assuming the value inside the `maybe` is an object, this method safely retrieves one of the object's properties.
+*/
+
+
+
+/*
 Advanced Usage
 ----
 */
@@ -126,61 +140,82 @@ QUnit.test("advanced", function(assert){//--
 	getFirstSecond({ first: {second:"value" } }).map((val) => assert.equal(val,"value"))
 	getFirstSecond({ first: {second:"other_value" } }).map((val) => assert.equal(val,"other_value"))
 	getFirstSecond({ first: "" }).map((val) => assert.equal(val,"whatever") )//won't be executed 
-
 })//--
 
 }//--
 QUnit.module("Maybe")//--
-test(maybe)//-- run the tests using a maybe
-QUnit.module("MaybeT")//-- run the tests using a monad transformer
+test(maybe)//--
+QUnit.module("MaybeT")//--
 test((val)=>maybeT(identity(val)))//--
 
     
 /*
 Combining with Other Monads
 ----
-In addition to creating a `maybe` from a plain value, you can also create one from an existing monad, using the `maybeT` constructor:
+in addition to creating a `maybe` from a plain value, you can also create one from an existing monad, using the `maybet` constructor:
 
-The resulting monad will gain all the characteristics of a `maybe` without losing the characteristics of the underlying monad.
+the resulting monad will gain all the characteristics of a `maybe` without losing the characteristics of the underlying monad.
 
 ***
 */
-    
-QUnit.module("maybeT Combinations")//--
 
+QUnit.test("basic", function(assert){//--
+    
+//Combining a maybe with a list, for example, creates a list where each of the values are `maybe`s
+//In the following example `map` will get called only for the first value:
+
+    maybeT(list(1, undefined)).map((val)=>{
+        assert.equal(val, 1)   
+    })
+
+})//--
 
 QUnit.test("list", function(assert){//--
+//This means you can use maybe to safely transform the list items.
+//If a list value is undefined, it will just stay undefined.
 
-//Combining a maybe with a list, for example, creates a list where each of the values are `maybe`s
-
-    var maybeList = maybeT(list({first:{ second:"value" } }, {first:{ second:"other value" } }, { first:""} ))
-
-//This means you can use maybe to safely transform the list items:
-
-    maybeList.phatMap((val)=> maybeT(val.first) ).phatMap((val)=> maybeT(val.second) )
-
-//This allows you to use a function that returns a maybe 
-
-
-
-//You can use the maybe
-
-    .getProp("a")
-    assert.deepEqual(bc._innerMonad, ["b", "c"])
-    var abc = bc.lift("reverse").lift("concat", ["a"])
-    assert.deepEqual(abc._innerMonad, ["c", "b", "a"])
+    maybeT(list({first:{ second:"value" } }, {first:{ second:"other value" } }, { first:""} ))
+        .phatMap((val)=> maybeT(val.first) )
+        .phatMap((val)=> maybeT(val.second) )
+        .lift(list => {
+                assert.deepEqual(list, ["value", "other value", undefined])
+        })
 })//--
-/*
-QUnit.test("state", function(assert){//--
-    maybeT(state(1))
-    .map()
-})
 
+
+/*
+`lift(funk)`
+----
+In addition to all other methods, `maybe` values, that are created from other monads using the `maybeT` constructor
+have the `lift` method which enables you to execute a function to the underlying monad:
+
+***
 */
 
+QUnit.test("lift", function(assert){//--
+    const maybeList = maybeT(list(["a","b","c"]))
+    
+    maybeList.lift((list) =>{
+        assert.deepEqual(list, ["a", "b", "c"])
+    })
+
+//You can also use `lift` to call a method that is defined in the monad, by specifying the method name as a string
+
+    maybeList
+        .lift("concat", ["d"])
+        .lift("reverse")
+        .lift((list) => {
+            assert.deepEqual(list, ["d", "c", "b", "a"])
+        })
+
+})//--
+
+
+
+
 
 /*
-under the hood
+Under the Hood
 --------------
 Let's see how the type is implemented
 */

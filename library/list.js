@@ -71,10 +71,10 @@ methods.extras = []
 //This is the list constructor. It takes normal array and augments it with the above methods
 	
 	var list = (...args) => {
-		if(args.length === 1 && args[0].funktionType === "list"){
+		if(args.length === 1 && args[0] !== undefined && args[0].funktionType === "list"){
 			return args[0]
 		//Accept an array
-		}else if(args.length === 1 && args[0].constructor === Array ){
+		}else if(args.length === 1 && args[0] !== undefined && args[0].constructor === Array ){
 			return  Object.freeze(extend(args[0], methods))
 		//Accept several arguments
 		}else{
