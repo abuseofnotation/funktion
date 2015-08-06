@@ -1,27 +1,25 @@
 
         const f = require("./f")//--
         var id = require("./identity")//--
-        var methods = Object.create(id.prototype)//--
+        var methods = Object.create(state.prototype)//--
 
-	const stateT = methods.constructor = function(run){
-		if(typeof run !== "function"){ return methods.of(run) }
-		const obj = Object.create(methods)
-		obj._runState = f(run,1)
-		return Object.freeze(obj)
+	const stateT = function(value){
+                var obj = Object.create(methods)
+                obj._innerMonad = (prevState) => [value, prevState]
+                return Object.freeze(obj)
 	}
+        
+	methods.funktionType = "stateT"//--
+        methods.constructor = stateT
 
-//`of` just uses the constructor and does not touch the state.
-
-	//a -> m a
-	methods.of = function of (input){
-		return this.constructor((prevState) => [input, prevState])
-	}
 
 //`map` is done by applying the function to the value and keeping the state unchanged.
 
 	//m a -> ( a -> b ) -> m b
 	methods.map = function map (funk){
-		return this.constructor( this._runState.map(([input, prevState]) => [funk(input), prevState]))
+		return this.constructor( this._innerMonad.map( (val) => funk(val) )
+
+		//return this.constructor( this._runState.map(([input, prevState]) => [funk(input), prevState]))
 	}
 	
 //`flat` does the following:
